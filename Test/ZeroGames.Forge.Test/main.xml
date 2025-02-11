@@ -1,0 +1,48 @@
+
+
+
+<Schema Name="Main" Namespace="ZeroGames.Forge.Test">
+    
+    <Import Uri="shared" Alias="Shared" />
+    
+    <Entity Abstract="true" Name="ItemBase" Namespace="System" PrimaryKey="Id, Uri">
+        <Property Type="uint64" Name="Id" />
+        <Property Type="string" Name="Uri" />
+    </Entity>
+
+    <Entity Name="Item" Namespace="System" Extends="ItemBase" Implements="Shared.INameProvider, Shared.IDescProvider">
+        <Property Type="Icon[]" Name="Icons" />
+        <Property Type="string[]" Name="Strings" />
+        <Property Type="string{}" Name="StringSet" />
+        <Property Type="string->int32" Name="AttributeMap" />
+        <Property Type="Icon?" Name="Icon" />
+    </Entity>
+    
+    <Entity Name="Weapon" Namespace="System" Extends="Item">
+        <Property Type="Shared.Point2D" Name="AttachPoint" />
+        <Property Type="Shared.EDamageType" Name="DamageType" />
+        <Property Type="double" Name="Damage" />
+    </Entity>
+
+    <Entity Name="Armor" Namespace="System" Extends="Item">
+        <Property Type="Shared.Point2D" Name="AttachPoint" />
+        <Property Type="double" Name="Defence" />
+    </Entity>
+    
+    <Entity Name="Icon">
+        <Property Type="uint64" Name="Id" />
+        <Property Type="string" Name="Path" />
+    </Entity>
+    
+    <Entity Name="Character">
+        <Property Type="uint64" Name="Id" />
+        <Property Type="OwningItem[]" Name="OwningItems" />
+        <Property Type="Shared.Constant" Name="Const" />
+    </Entity>
+    
+    <Struct Name="OwningItem">
+        <Property Type="Item" Name="Item" />
+        <Property Type="int32" Name="Num" />
+    </Struct>
+
+</Schema>

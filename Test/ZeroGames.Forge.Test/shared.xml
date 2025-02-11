@@ -1,0 +1,33 @@
+
+
+
+<Schema Name="Shared" Namespace="ZeroGames.Forge.Test.Shared">
+    
+    <Interface Name="INameProvider">
+        <Property Type="string" Name="Name" />
+    </Interface>
+
+    <Interface Name="IDescProvider" Extends="INameProvider">
+        <Property Type="string?" Name="Desc" />
+    </Interface>
+
+    <Entity Name="Constant">
+        <Property Type="uint64" Name="Id" />
+        <Property Type="string" Name="Value" />
+    </Entity>
+
+    <Struct Name="Point2D">
+        <Property Type="double" Name="X" />
+        <Property Type="double" Name="Y" />
+    </Struct>
+
+    <Struct Name="Point3D" Extends="Point2D">
+        <Property Type="double" Name="Z" />
+    </Struct>
+
+    <Enum Name="EDamageType">
+        <Element Name="Phys" Value="0" />
+        <Element Name="Mana" Value="1" />
+    </Enum>
+
+</Schema>
