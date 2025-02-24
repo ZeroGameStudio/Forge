@@ -28,7 +28,7 @@ public partial class CSharpCompilerBackend
 		=> $"[Schema(typeof({GetSchemaTypeName(schema)}))]";
 
 	private static string GetGeneratedCodeAttributeCode()
-		=> $"[global::System.CodeDom.Compiler.GeneratedCode(\"ZeroForgeCompiler\", \"{Assembly.GetExecutingAssembly().GetName().Version!.ToString(3)}\")]";
+		=> $"[global::System.CodeDom.Compiler.GeneratedCode(\"Forge\", \"{Assembly.GetExecutingAssembly().GetName().Version!.ToString(3)}\")]";
 	
 	private static bool IsSubnamespaceOf(string super, string sub)
 	{
