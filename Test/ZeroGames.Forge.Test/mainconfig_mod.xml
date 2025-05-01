@@ -6,7 +6,7 @@
     <CharacterRepository>
 
         <Character>
-            <Id>101</Id>
+            <Id>102</Id>
             <OwningItems>
                 <Element>
                     <OwningItem>

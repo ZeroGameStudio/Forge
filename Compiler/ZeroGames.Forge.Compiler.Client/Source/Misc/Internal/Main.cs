@@ -11,6 +11,7 @@ foreach (var arg in args)
 	string[] kv = arg.Split('=');
 	string name = kv[0].ToLower();
 	string value = kv.Length > 1 ? kv[1] : string.Empty;
+	Console.WriteLine($"{name}: {value}");
 	switch (name)
 	{
 		case "sourcedirs":

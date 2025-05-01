@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Compiler/">
+    <Project Path="Compiler/ZeroGames.Forge.Compiler.Backend.CSharp/ZeroGames.Forge.Compiler.Backend.CSharp.csproj" />
+    <Project Path="Compiler/ZeroGames.Forge.Compiler.Backend/ZeroGames.Forge.Compiler.Backend.csproj" />
+    <Project Path="Compiler/ZeroGames.Forge.Compiler.Client/ZeroGames.Forge.Compiler.Client.csproj" />
+    <Project Path="Compiler/ZeroGames.Forge.Compiler.Frontend.Xml/ZeroGames.Forge.Compiler.Frontend.Xml.csproj" />
+    <Project Path="Compiler/ZeroGames.Forge.Compiler.Frontend/ZeroGames.Forge.Compiler.Frontend.csproj" />
+    <Project Path="Compiler/ZeroGames.Forge.Compiler.Server/ZeroGames.Forge.Compiler.Server.csproj" />
+    <Project Path="Compiler/ZeroGames.Forge.Compiler/ZeroGames.Forge.Compiler.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/">
+    <Project Path="Runtime/ZeroGames.Forge.Runtime/ZeroGames.Forge.Runtime.csproj" />
+  </Folder>
+  <Folder Name="/Test/">
+    <Project Path="Test/ZeroGames.Forge.Test/ZeroGames.Forge.Test.csproj" />
+  </Folder>
+</Solution>

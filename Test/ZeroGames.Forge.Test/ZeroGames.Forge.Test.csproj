@@ -1,6 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="ZeroGames.NET.Sdk/1.0.0">
 
     <PropertyGroup>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
         <LangVersion>preview</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -10,20 +11,7 @@
         <AssemblyVersion>1.0.0</AssemblyVersion>
         <FileVersion>1.0.0</FileVersion>
         <NeutralLanguage>zh</NeutralLanguage>
-        <WarningsAsErrors>$(WarningsAsErrors);CS8600;CS8601;CS8602;CS8603;CS8604;CS8609;CS8610;CS8614;CS8616;CS8618;CS8619;CS8622;CS8625;CS8629;CS8777</WarningsAsErrors>
-        <OutputType>Exe</OutputType>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Using Include="System.Byte" Alias="uint8" />
-        <Using Include="System.UInt16" Alias="uint16" />
-        <Using Include="System.UInt32" Alias="uint32" />
-        <Using Include="System.UInt64" Alias="uint64" />
-        <Using Include="System.SByte" Alias="int8" />
-        <Using Include="System.Int16" Alias="int16" />
-        <Using Include="System.Int32" Alias="int32" />
-        <Using Include="System.Int64" Alias="int64" />
-    </ItemGroup>
     
     <ItemGroup>
         <Compile Include="obj/Generated/**/*.cs">
@@ -38,6 +26,12 @@
         <None Update="sharedconfig.xml">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="mainconfig2.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="mainconfig_mod.xml">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
     
     <ItemGroup>
@@ -45,3 +39,5 @@
     </ItemGroup>
 
 </Project>
+
+

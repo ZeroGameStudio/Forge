@@ -4,7 +4,7 @@ using System.Xml.Linq;
 
 namespace ZeroGames.Forge.Runtime;
 
-internal class XDocumentStreamProvider : IXDocumentProvider
+public class XDocumentStreamProvider : IXDocumentProvider
 {
 	public XDocumentStreamProvider(Stream source)
 	{

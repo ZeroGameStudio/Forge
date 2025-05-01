@@ -78,7 +78,7 @@ internal class RepositoryFactory
 					repository.TryGetEntity(primaryKey, true, out baseEntity);
 					if (baseEntity is null || baseEntity.GetType() != entityType)
 					{
-						throw new InvalidOperationException();
+						throw new InvalidOperationException($"Base ({primaryKey}) not found for entity '{entity.PrimaryKey}'.");
 					}
 					
 					InitializeEntity(baseEntity, pendingInitializedEntities[baseEntity]);
@@ -98,7 +98,7 @@ internal class RepositoryFactory
 					{
 						if (!@abstract && baseEntity is null)
 						{
-							throw new InvalidOperationException();
+							throw new InvalidOperationException($"Missing property {property.Name} on entity '{entity.PrimaryKey}'.");
 						}
 
 						if (baseEntity is not null)
@@ -118,7 +118,7 @@ internal class RepositoryFactory
 					{
 						if (propertyElement is null)
 						{
-							throw new InvalidOperationException();
+							throw new InvalidOperationException($"Missing property {property.Name} on entity '{entity.PrimaryKey}'.");
 						}
 						
 						object? value = Serialize(property.PropertyType, propertyElement, property.IsNotNull() ? ReturnNotNull.True : ReturnNotNull.False, getEntity);
