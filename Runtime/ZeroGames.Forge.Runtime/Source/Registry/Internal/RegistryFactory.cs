@@ -10,7 +10,7 @@ public class RegistryFactory : IRegistryFactory
 
 	public object Create(Type registryType, IEnumerable<IXDocumentProvider> sources, IEnumerable<IRegistry> imports)
 	{
-		Logger?.Invoke(ELogVerbosity.Log, $"Creating registry {registryType.Name}...");
+		Logger?.Invoke(ELogVerbosity.Log, $"Creating {registryType.Name}...");
 		
 		if (registryType.IsInterface || registryType.IsAbstract || !registryType.IsAssignableTo(typeof(IRegistry)))
 		{
@@ -74,7 +74,7 @@ public class RegistryFactory : IRegistryFactory
 			int32 i = 0;
 			foreach (var repositoryProperty in metadata.Repositories)
 			{
-				Logger?.Invoke(ELogVerbosity.Log, $"Allocating repository {repositoryProperty.Name}...");
+				Logger?.Invoke(ELogVerbosity.Log, $"Allocating {repositoryProperty.Name}...");
 				
 				Type propertyType = repositoryProperty.PropertyType;
 				Type entityType = propertyType.GetGenericInstanceOf(typeof(IRepository<,>))!.GetGenericArguments()[1];
@@ -111,7 +111,7 @@ public class RegistryFactory : IRegistryFactory
 			{
 				var baseRepository = (IInitializingRepository)repositoryByEntityType[repository.EntityType.BaseType!];
 				
-				Logger?.Invoke(ELogVerbosity.Log, $"Merging repository {repository.Name} to base repository {baseRepository.Name}...");
+				Logger?.Invoke(ELogVerbosity.Log, $"Merging {repository.Name} to {baseRepository.Name}...");
 				
 				foreach (var entity in repository.Entities)
 				{
@@ -137,6 +137,9 @@ public class RegistryFactory : IRegistryFactory
 		}
 		
 		(registry as INotifyInitialization)?.PostInitialize();
+		
+		Logger?.Invoke(ELogVerbosity.Log, $"Successfully created {registry.Name}!");
+		
 		return registry;
 	}
 	

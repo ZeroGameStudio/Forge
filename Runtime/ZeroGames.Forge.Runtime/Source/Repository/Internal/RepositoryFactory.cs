@@ -22,7 +22,7 @@ internal class RepositoryFactory
 	
 	public IInitializingRepository Create(IRegistry registry, Type entityType, XElement repositoryElement, out FinishInitializationDelegate finishInitialization)
 	{
-		Logger?.Invoke(ELogVerbosity.Log, $"Creating repository {entityType.Name}...");
+		Logger?.Invoke(ELogVerbosity.Log, $"Creating {entityType.Name}Repository...");
 		
 		IInitializingRepository repository = AllocateRepository(registry, entityType);
 		GetEntityMetadata(entityType, out var metadata);
@@ -58,7 +58,7 @@ internal class RepositoryFactory
 			repository.RegisterEntity(entity, @abstract);
 			pendingInitializedEntities[entity] = entityElement;
 			
-			Logger?.Invoke(ELogVerbosity.Verbose, $"Allocated entity ({entity.PrimaryKey}).");
+			Logger?.Invoke(ELogVerbosity.Verbose, $"Allocated entity {entityType.Name}({entity.PrimaryKey}).");
 		}
 
 		finishInitialization = getEntity =>
@@ -70,12 +70,12 @@ internal class RepositoryFactory
 
 			void InitializeEntity(IEntity entity, XElement entityElement)
 			{
-				Logger?.Invoke(ELogVerbosity.Log, $"Fixing up entity ({entity.PrimaryKey})...");
-				
 				if (!initializedEntities.Add(entity))
 				{
 					return;
 				}
+				
+				Logger?.Invoke(ELogVerbosity.Verbose, $"Fixing up entity {entityType.Name}({entity.PrimaryKey})...");
 				
 				// If entity extends another entity, then the base entity must get initialized first (recursively).
 				string? baseEntityReference = entityElement.Attribute(EXTENDS_ATTRIBUTE_NAME)?.Value;
