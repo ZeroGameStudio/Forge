@@ -7,9 +7,11 @@ namespace ZeroGames.Forge.Runtime;
 
 public class RegistryFactory : IRegistryFactory
 {
-	
+
 	public object Create(Type registryType, IEnumerable<IXDocumentProvider> sources, IEnumerable<IRegistry> imports)
 	{
+		Logger?.Invoke(ELogVerbosity.Log, $"Creating registry {registryType.Name}...");
+		
 		if (registryType.IsInterface || registryType.IsAbstract || !registryType.IsAssignableTo(typeof(IRegistry)))
 		{
 			throw new ArgumentOutOfRangeException(nameof(registryType));
@@ -31,8 +33,11 @@ public class RegistryFactory : IRegistryFactory
 		
 		Dictionary<Type, IRepository> repositoryByEntityType = [];
 		{ // Stage I: Fill import registries
+			Logger?.Invoke(ELogVerbosity.Log, "Importing dependencies...");
 			foreach (var importProperty in metadata.Imports)
 			{
+				Logger?.Invoke(ELogVerbosity.Log, $"Importing dependency {importProperty.Name}...");
+				
 				Type propertyType = importProperty.PropertyType;
 				string name = propertyType.Name;
 				if (!importMap.TryGetValue(name, out var import))
@@ -61,12 +66,16 @@ public class RegistryFactory : IRegistryFactory
 		RepositoryFactory factory = new()
 		{
 			PrimitiveSerializerMap = new Dictionary<Type, Func<string, object>>(),
+			Logger = Logger,
 		};
 		var finishInitializations = new RepositoryFactory.FinishInitializationDelegate[metadata.Repositories.Count];
 		{ // Stage II: Allocate all repositories first but not initialize here (only properties defined by IEntity interface is available on entities).
+			Logger?.Invoke(ELogVerbosity.Log, "Allocating repositories...");
 			int32 i = 0;
 			foreach (var repositoryProperty in metadata.Repositories)
 			{
+				Logger?.Invoke(ELogVerbosity.Log, $"Allocating repository {repositoryProperty.Name}...");
+				
 				Type propertyType = repositoryProperty.PropertyType;
 				Type entityType = propertyType.GetGenericInstanceOf(typeof(IRepository<,>))!.GetGenericArguments()[1];
 				XElement? root = document.Root?.Element($"{entityType.Name}Repository");
@@ -89,6 +98,7 @@ public class RegistryFactory : IRegistryFactory
 		}
 		
 		{ // Stage III: Merge concrete entities in inherited repository into base repository.
+			Logger?.Invoke(ELogVerbosity.Log, "Merging repositories to base...");
 			foreach (var repository in repositoryByEntityType
 				         .Select(pair => pair.Value)
 				         .Where(repo => repo.EntityType.BaseType is {} baseType && baseType != typeof(object))
@@ -100,6 +110,9 @@ public class RegistryFactory : IRegistryFactory
 				         }))
 			{
 				var baseRepository = (IInitializingRepository)repositoryByEntityType[repository.EntityType.BaseType!];
+				
+				Logger?.Invoke(ELogVerbosity.Log, $"Merging repository {repository.Name} to base repository {baseRepository.Name}...");
+				
 				foreach (var entity in repository.Entities)
 				{
 					baseRepository.RegisterEntity(entity, false);
@@ -108,6 +121,7 @@ public class RegistryFactory : IRegistryFactory
 		}
 		
 		{ // Stage IV: Now all entities are in right place, and we can initialize them: Fill data, fixup references, etc.
+			Logger?.Invoke(ELogVerbosity.Log, "Fixing up registry...");
 			RepositoryFactory.GetEntityDelegate getEntity = (type, primaryKey) => repositoryByEntityType[type][primaryKey];
 			foreach (var finishInitialization in finishInitializations)
 			{
@@ -125,6 +139,8 @@ public class RegistryFactory : IRegistryFactory
 		(registry as INotifyInitialization)?.PostInitialize();
 		return registry;
 	}
+	
+	public Action<ELogVerbosity, object?>? Logger { get; init; }
 
 	private readonly struct RegistryMetadata
 	{

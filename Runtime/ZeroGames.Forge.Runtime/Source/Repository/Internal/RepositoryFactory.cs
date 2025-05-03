@@ -22,9 +22,12 @@ internal class RepositoryFactory
 	
 	public IInitializingRepository Create(IRegistry registry, Type entityType, XElement repositoryElement, out FinishInitializationDelegate finishInitialization)
 	{
+		Logger?.Invoke(ELogVerbosity.Log, $"Creating repository {entityType.Name}...");
+		
 		IInitializingRepository repository = AllocateRepository(registry, entityType);
 		GetEntityMetadata(entityType, out var metadata);
 
+		Logger?.Invoke(ELogVerbosity.Log, "Allocating entities...");
 		Dictionary<IEntity, XElement> pendingInitializedEntities = [];
 		foreach (var entityElement in repositoryElement.Elements())
 		{
@@ -38,7 +41,7 @@ internal class RepositoryFactory
 			{
 				throw new InvalidOperationException($"Create instance of type {entityType.Name} failed.");
 			}
-			
+
 			foreach (var property in metadata.PrimaryKeyComponents)
 			{
 				XElement? propertyElement = entityElement.Element(property.Name);
@@ -54,15 +57,21 @@ internal class RepositoryFactory
 			bool @abstract = entityElement.Attribute(ABSTRACT_ATTRIBUTE_NAME) is { } abstractAttr && bool.Parse(abstractAttr.Value);
 			repository.RegisterEntity(entity, @abstract);
 			pendingInitializedEntities[entity] = entityElement;
+			
+			Logger?.Invoke(ELogVerbosity.Verbose, $"Allocated entity ({entity.PrimaryKey}).");
 		}
 
 		finishInitialization = getEntity =>
 		{
+			Logger?.Invoke(ELogVerbosity.Log, $"Fixing up entities for repository {repository.Name}...");
+			
 			HashSet<IEntity> initializedEntities = [];
 			Dictionary<IEntity, Dictionary<PropertyInfo, XElement?>> entityPropertyElementLookup = [];
 
 			void InitializeEntity(IEntity entity, XElement entityElement)
 			{
+				Logger?.Invoke(ELogVerbosity.Log, $"Fixing up entity ({entity.PrimaryKey})...");
+				
 				if (!initializedEntities.Add(entity))
 				{
 					return;
@@ -154,6 +163,8 @@ internal class RepositoryFactory
 	
 	public required IReadOnlyDictionary<Type, Func<string, object>> PrimitiveSerializerMap { private get; init; }
 
+	public Action<ELogVerbosity, object?>? Logger { get; init; }
+	
 	private readonly struct ReturnNotNull
 	{
 		public static ReturnNotNull True => default;
