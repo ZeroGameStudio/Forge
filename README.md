@@ -1,2 +1,2 @@
 # Forge
-An extendable data configuration toolchain for game development.
+An extensible data configuration toolchain for game development.
