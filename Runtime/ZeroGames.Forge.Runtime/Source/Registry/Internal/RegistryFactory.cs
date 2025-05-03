@@ -72,13 +72,13 @@ public class RegistryFactory : IRegistryFactory
 				XElement? root = document.Root?.Element($"{entityType.Name}Repository");
 				if (root is null ^ entityType.IsAbstract)
 				{
-					throw new InvalidOperationException();
+					throw new InvalidOperationException($"Missing repository {entityType.Name}.");
 				}
 
 				IInitializingRepository repository = root is not null ? factory.Create(registry, entityType, root, out var finishInitialization) : factory.Create(registry, entityType, out finishInitialization);
 				if (!repository.GetType().IsAssignableTo(propertyType))
 				{
-					throw new InvalidOperationException();
+					throw new InvalidOperationException($"Repository type {entityType.Name} mismatch to required type {propertyType.Name}.");
 				}
 			
 				repositoryProperty.SetValue(registry, repository);
@@ -230,12 +230,12 @@ public class RegistryFactory : IRegistryFactory
 				{
 					if (property.SetMethod is null)
 					{
-						throw new InvalidOperationException();
+						throw new InvalidOperationException($"Property {property.Name} is readonly.");
 					}
 					
 					if (!propertyType.IsAssignableTo(typeof(IRegistry)))
 					{
-						throw new InvalidOperationException();
+						throw new InvalidOperationException($"Property type {propertyType.Name} does not implement IRegistry.");
 					}
 				
 					imports.Add(property);
@@ -244,12 +244,12 @@ public class RegistryFactory : IRegistryFactory
 				{
 					if (property.SetMethod is null)
 					{
-						throw new InvalidOperationException();
+						throw new InvalidOperationException($"Property {property.Name} is readonly.");
 					}
 					
 					if (!propertyType.GetInterfaces().Append(propertyType).Any(interfaceType => interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof(IRepository<,>)))
 					{
-						throw new InvalidOperationException();
+						throw new InvalidOperationException($"Property type {propertyType.Name} does not implement IRepository<,>.");
 					}
 				
 					repositories.Add(property);
@@ -258,12 +258,12 @@ public class RegistryFactory : IRegistryFactory
 				{
 					if (property.SetMethod is null)
 					{
-						throw new InvalidOperationException();
+						throw new InvalidOperationException($"Property {property.Name} is readonly.");
 					}
 					
 					if (!propertyType.IsAssignableTo(typeof(IIndex)))
 					{
-						throw new InvalidOperationException();
+						throw new InvalidOperationException($"Property type {propertyType.Name} does not implement IIndex.");
 					}
 				
 					autoIndices.Add(property);

@@ -30,13 +30,13 @@ internal class RepositoryFactory
 		{
 			if (entityElement.Name != entityType.Name)
 			{
-				throw new InvalidOperationException();
+				throw new InvalidOperationException($"Entity element name {entityElement.Name} mismatch to required {entityType.Name}.");
 			}
 			
 			var entity = (IEntity?)Activator.CreateInstance(entityType);
 			if (entity is null)
 			{
-				throw new InvalidOperationException();
+				throw new InvalidOperationException($"Create instance of type {entityType.Name} failed.");
 			}
 			
 			foreach (var property in metadata.PrimaryKeyComponents)
@@ -44,7 +44,7 @@ internal class RepositoryFactory
 				XElement? propertyElement = entityElement.Element(property.Name);
 				if (propertyElement is null)
 				{
-					throw new InvalidOperationException();
+					throw new InvalidOperationException($"Entity property {property.Name} not found.");
 				}
 				
 				object value = SerializePrimitive(property.PropertyType, propertyElement.Value);
