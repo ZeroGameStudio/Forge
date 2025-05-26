@@ -8,7 +8,7 @@ namespace ZeroGames.Forge.Runtime;
 public class RegistryFactory : IRegistryFactory
 {
 
-	public object Create(Type registryType, IEnumerable<IXDocumentProvider> sources, IEnumerable<IRegistry> imports)
+	public object Create(Type registryType, IFmlDocumentSource source, params IEnumerable<IRegistry> imports)
 	{
 		Logger?.Invoke(ELogVerbosity.Log, $"Creating {registryType.Name}...");
 		
@@ -17,8 +17,7 @@ public class RegistryFactory : IRegistryFactory
 			throw new ArgumentOutOfRangeException(nameof(registryType));
 		}
 
-		IXDocumentProvider[] preservedSources = sources.ToArray();
-		XDocument document = preservedSources.Length == 1 ? preservedSources[0].Document : Merge(preservedSources, registryType);
+		XDocument document = source.Document;
 		if (document.Root?.Name != registryType.Name)
 		{
 			throw new InvalidOperationException($"Document root does not match registry type {registryType.Name}.");
@@ -65,7 +64,7 @@ public class RegistryFactory : IRegistryFactory
 		
 		RepositoryFactory factory = new()
 		{
-			PrimitiveSerializerMap = new Dictionary<Type, Func<string, object>>(),
+			PrimitiveSerializerMap = [],
 			Logger = Logger,
 		};
 		var finishInitializations = new RepositoryFactory.FinishInitializationDelegate[metadata.Repositories.Count];
@@ -152,10 +151,10 @@ public class RegistryFactory : IRegistryFactory
 		public required IReadOnlyList<PropertyInfo> AutoIndices { get; init; }
 	}
 
-	private static XDocument Merge(IXDocumentProvider[] sources, Type registryType)
+	private static XDocument Merge(IFmlDocumentSource[] sources, Type registryType)
 	{
 		XDocument result = new(new XElement(registryType.Name));
-		foreach (var source in sources.Select(provider => Desugar(provider.Document)))
+		foreach (var source in sources.Select(s => s.Document))
 		{
 			if (result.Root!.Name != source.Root?.Name)
 			{
