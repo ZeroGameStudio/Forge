@@ -7,7 +7,7 @@ namespace ZeroGames.Forge.Runtime;
 public interface IXDocumentProvider
 {
 	public static IXDocumentProvider FromFile(string filepath) => new XDocumentObjectProvider(XDocument.Load(filepath));
-	public static IXDocumentProvider[] FromFiles(params IEnumerable<string> filepaths) => filepaths.Select(filepath => FromFile(filepath)).ToArray();
+	public static IXDocumentProvider[] FromFiles(params IEnumerable<string> filepaths) => filepaths.Select(FromFile).ToArray();
 	
 	public XDocument Document { get; }
 	// @TODO: bool AllowMergeRepository

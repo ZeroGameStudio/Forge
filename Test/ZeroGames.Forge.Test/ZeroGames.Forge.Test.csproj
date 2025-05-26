@@ -35,8 +35,13 @@
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\..\Compiler\ZeroGames.Forge.Compiler.Client\ZeroGames.Forge.Compiler.Client.csproj" />
       <ProjectReference Include="..\..\Runtime\ZeroGames.Forge.Runtime\ZeroGames.Forge.Runtime.csproj" />
     </ItemGroup>
+    
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+      <Exec Command=".\Compile.bat" />
+    </Target>
 
 </Project>
 
