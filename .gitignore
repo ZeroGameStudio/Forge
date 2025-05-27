@@ -4,6 +4,7 @@
 # Rider user specific files
 .idea/
 *.DotSettings.user
+*.DotSettings
 
 # .NET Intermediate files
 obj/
