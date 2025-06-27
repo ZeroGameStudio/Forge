@@ -64,7 +64,7 @@ public class RegistryFactory : IRegistryFactory
 		
 		RepositoryFactory factory = new()
 		{
-			PrimitiveSerializerMap = [],
+			PrimitiveSerializerMap = new Dictionary<Type, Func<string, object>>(),
 			Logger = Logger,
 		};
 		var finishInitializations = new RepositoryFactory.FinishInitializationDelegate[metadata.Repositories.Count];
@@ -222,12 +222,6 @@ public class RegistryFactory : IRegistryFactory
 		return result;
 	}
 
-	private static XDocument Desugar(XDocument document)
-	{
-		// @TODO: Returns a new document which has removed all syntactic sugar of the input document.
-		return new(document);
-	}
-	
 	private static void GetRegistryMetadata(Type registryType, out RegistryMetadata metadata)
 	{
 		lock (_metadataLock)

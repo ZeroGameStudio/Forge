@@ -25,7 +25,7 @@ internal readonly struct CompilerClientConfig
 	public string? DefaultPrimaryKey { get; init; }
 	public string? DefaultEnumUnderlyingTypeName { get; init; }
 	
-	public required HashSet<string> ImplicitlyUsings { get; init; }
+	public required HashSet<string> ImplicitUsings { get; init; }
 	
 	public required bool RequiresOutputDirNotExists { get; init; }
 	public bool GeneratesPartialTypes { get; init; }

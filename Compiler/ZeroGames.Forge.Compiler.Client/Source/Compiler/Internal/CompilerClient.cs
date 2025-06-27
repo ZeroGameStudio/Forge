@@ -85,7 +85,7 @@ internal sealed class CompilerClient
 	{
 		return new CSharpCompilerBackend(new()
 		{
-			ImplicitlyUsings = _config.ImplicitlyUsings,
+			ImplicitlyUsings = _config.ImplicitUsings,
 			GeneratesPartialTypes = _config.GeneratesPartialTypes,
 		});
 	}

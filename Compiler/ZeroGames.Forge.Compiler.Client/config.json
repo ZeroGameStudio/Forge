@@ -20,7 +20,7 @@
 	"DefaultPrimaryKey": "Id",
 	"DefaultEnumUnderlyingTypeName": "uint8",
 	
-	"ImplicitlyUsings": [
+	"ImplicitUsings": [
 		"System",
 		"System.Collections.Generic"
 	],

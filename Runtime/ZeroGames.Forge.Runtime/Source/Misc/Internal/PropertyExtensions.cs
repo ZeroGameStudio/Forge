@@ -15,11 +15,13 @@ public static class PropertyExtensions
 		}
 		else
 		{
-			return new NullabilityInfoContext().Create(@this).ReadState != NullabilityState.NotNull;
+			return _nullabilityInfoContext.Create(@this).ReadState != NullabilityState.NotNull;
 		}
 	}
 
 	public static bool IsNotNull(this PropertyInfo @this) => !@this.IsNullable();
+	
+	private static readonly NullabilityInfoContext _nullabilityInfoContext = new();
 
 }
 

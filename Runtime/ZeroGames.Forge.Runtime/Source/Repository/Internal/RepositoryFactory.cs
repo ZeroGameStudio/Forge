@@ -420,18 +420,18 @@ internal class RepositoryFactory
 
 	private static readonly IReadOnlyDictionary<Type, Func<string, object>> _fallbackPrimitiveSerializerMap = new Dictionary<Type, Func<string, object>>
 	{
-		[typeof(uint8)] = value => !string.IsNullOrWhiteSpace(value) ? uint8.Parse(value) : 0,
-		[typeof(uint16)] = value => !string.IsNullOrWhiteSpace(value) ? uint16.Parse(value) : 0,
-		[typeof(uint32)] = value => !string.IsNullOrWhiteSpace(value) ? uint32.Parse(value) : 0,
-		[typeof(uint64)] = value => !string.IsNullOrWhiteSpace(value) ? uint64.Parse(value) : 0,
-		[typeof(int8)] = value => !string.IsNullOrWhiteSpace(value) ? int8.Parse(value) : 0,
-		[typeof(int16)] = value => !string.IsNullOrWhiteSpace(value) ? int16.Parse(value) : 0,
-		[typeof(int32)] = value => !string.IsNullOrWhiteSpace(value) ? int32.Parse(value) : 0,
-		[typeof(int64)] = value => !string.IsNullOrWhiteSpace(value) ? int64.Parse(value) : 0,
-		[typeof(float)] = value => !string.IsNullOrWhiteSpace(value) ? float.Parse(value) : 0,
-		[typeof(double)] = value => !string.IsNullOrWhiteSpace(value) ? double.Parse(value) : 0,
-		[typeof(bool)] = value => !string.IsNullOrWhiteSpace(value) && bool.Parse(value),
-		[typeof(string)] = value => value,
+		[typeof(uint8)] = static value => !string.IsNullOrWhiteSpace(value) ? uint8.Parse(value) : 0,
+		[typeof(uint16)] = static value => !string.IsNullOrWhiteSpace(value) ? uint16.Parse(value) : 0,
+		[typeof(uint32)] = static value => !string.IsNullOrWhiteSpace(value) ? uint32.Parse(value) : 0,
+		[typeof(uint64)] = static value => !string.IsNullOrWhiteSpace(value) ? uint64.Parse(value) : 0,
+		[typeof(int8)] = static value => !string.IsNullOrWhiteSpace(value) ? int8.Parse(value) : 0,
+		[typeof(int16)] = static value => !string.IsNullOrWhiteSpace(value) ? int16.Parse(value) : 0,
+		[typeof(int32)] = static value => !string.IsNullOrWhiteSpace(value) ? int32.Parse(value) : 0,
+		[typeof(int64)] = static value => !string.IsNullOrWhiteSpace(value) ? int64.Parse(value) : 0,
+		[typeof(float)] = static value => !string.IsNullOrWhiteSpace(value) ? float.Parse(value) : 0,
+		[typeof(double)] = static value => !string.IsNullOrWhiteSpace(value) ? double.Parse(value) : 0,
+		[typeof(bool)] = static value => !string.IsNullOrWhiteSpace(value) && bool.Parse(value),
+		[typeof(string)] = static value => value,
 	};
 	
 	private static readonly Dictionary<Type, EntityMetadata> _metadata = new();
