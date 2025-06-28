@@ -13,9 +13,13 @@ public class ForgeDocumentSourceFactory<T>() : ForgeDocumentSourceFactory(typeof
 
 public static class ForgeDocumentSourceFactoryExtensions
 {
-    public static FmlxDocumentSource FromFmlx(this ForgeDocumentSourceFactory factory, XDocument source, bool fmlx = true) => new(factory.RegistryType, source, fmlx);
-    public static FmlxDocumentSource FromFmlx(this ForgeDocumentSourceFactory factory, Stream source, bool fmlx = true) => new(factory.RegistryType, source, fmlx);
-    public static FmlxDocumentSource FromFmlx(this ForgeDocumentSourceFactory factory, string sourcePath, bool fmlx = true) => new(factory.RegistryType, XDocument.Load(sourcePath), fmlx);
+    public static FmlxDocumentSource CreateFmlx(this ForgeDocumentSourceFactory factory, XDocument source) => new(factory.RegistryType, source);
+    public static FmlxDocumentSource CreateFmlx(this ForgeDocumentSourceFactory factory, Stream source) => new(factory.RegistryType, source);
+    public static FmlxDocumentSource CreateFmlx(this ForgeDocumentSourceFactory factory, string sourcePath) => new(factory.RegistryType, XDocument.Load(sourcePath));
+    
+    public static FmlDocumentSource CreateFml(this ForgeDocumentSourceFactory factory, XDocument source) => new(factory.RegistryType, source);
+    public static FmlDocumentSource CreateFml(this ForgeDocumentSourceFactory factory, Stream source) => new(factory.RegistryType, source);
+    public static FmlDocumentSource CreateFml(this ForgeDocumentSourceFactory factory, string sourcePath) => new(factory.RegistryType, XDocument.Load(sourcePath));
 }
 
 

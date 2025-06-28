@@ -11,9 +11,9 @@ var mainSource = new FmlDocumentTransformer
 (
     new FmlDocumentAggregator
     (
-        factory.FromFmlx("mainconfig.xml"),
-        factory.FromFmlx("mainconfig2.xml"),
-        factory.FromFmlx("mainconfig_mod.xml")
+        factory.CreateFmlx("mainconfig.xml"),
+        factory.CreateFmlx("mainconfig2.xml"),
+        factory.CreateFmlx("mainconfig_mod.xml")
     )
 );
 var mainRegistry = new RegistryFactory().Create<MainRegistry>(mainSource, sharedRegistry);
