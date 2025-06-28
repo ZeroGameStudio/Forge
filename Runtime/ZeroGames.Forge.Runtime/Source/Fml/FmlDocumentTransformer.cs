@@ -4,21 +4,21 @@ using System.Xml.Linq;
 
 namespace ZeroGames.Forge.Runtime;
 
-public class FmlDocumentTransformer(IForgeDocumentSource source, params IEnumerable<IFmltDocumentSource> transformers) : IForgeDocumentSource
+public class FmlDocumentTransformer(IFmlDocumentSource source, params IEnumerable<IFmltDocumentSource> transformers) : IFmlDocumentSource
 {
 
-    public ForgeDocument Document => field == default ? field = Transform() : field;
+    public FmlDocument Document => field == default ? field = Transform() : field;
 
-    private ForgeDocument Transform()
+    private FmlDocument Transform()
     {
-        XDocument result = new(_source.Document.FmlDocument);
+        XDocument result = new(_source.Document.Document);
         
         // @TODO: Apply transforms.
 
-        return _source.Document with { FmlDocument = result };
+        return _source.Document with { Document = result };
     }
 
-    private readonly IForgeDocumentSource _source = source;
+    private readonly IFmlDocumentSource _source = source;
     private readonly IEnumerable<IFmltDocumentSource> _transformers = transformers;
     
 }

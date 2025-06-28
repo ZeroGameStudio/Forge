@@ -6,10 +6,10 @@ using System.Xml.Linq;
 
 namespace ZeroGames.Forge.Runtime;
 
-public class FmlDocumentAggregator : IForgeDocumentSource
+public class FmlDocumentAggregator : IFmlDocumentSource
 {
 
-    public FmlDocumentAggregator(params IEnumerable<IForgeDocumentSource> sources)
+    public FmlDocumentAggregator(params IEnumerable<IFmlDocumentSource> sources)
     {
 	    _sources = sources.ToList();
 	    if (_sources.Count == 0)
@@ -24,15 +24,15 @@ public class FmlDocumentAggregator : IForgeDocumentSource
 	    }
     }
 
-    public ForgeDocument Document => field == default ? field = Aggregate() : field;
+    public FmlDocument Document => field == default ? field = Aggregate() : field;
 
     public bool AllowsMergeRepository { get; init; } = true;
     public bool AllowsOverrideEntity { get; init; } = true;
 
-    private ForgeDocument Aggregate()
+    private FmlDocument Aggregate()
     {
         XDocument result = new(new XElement(_registryType.Name));
-		foreach (var source in _sources.Select(s => s.Document.FmlDocument))
+		foreach (var source in _sources.Select(s => s.Document.Document))
 		{
 			if (result.Root!.Name != source.Root?.Name)
 			{
@@ -118,7 +118,7 @@ public class FmlDocumentAggregator : IForgeDocumentSource
     private const string REPOSITORY_SUFFIX = "Repository";
     
     private readonly Type _registryType;
-    private readonly List<IForgeDocumentSource> _sources;
+    private readonly List<IFmlDocumentSource> _sources;
     
 }
 

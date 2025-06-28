@@ -7,9 +7,9 @@ namespace ZeroGames.Forge.Runtime;
 public class FmlxCompiler
 {
     
-    public ForgeDocument Compile(ForgeDocument source)
+    public FmlDocument Compile(FmlDocument source)
     {
-        XDocument result = new(source.FmlDocument);
+        XDocument result = new(source.Document);
 
         foreach (var repositoryElement in result.Root!.Elements())
         {
@@ -36,7 +36,7 @@ public class FmlxCompiler
             }
         }
 
-        return source with { FmlDocument = result };
+        return source with { Document = result };
     }
 
     private void CompileEntity(Type entityType, XElement entityElement)

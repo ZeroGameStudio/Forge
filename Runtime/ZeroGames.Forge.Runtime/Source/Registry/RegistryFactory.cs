@@ -8,7 +8,7 @@ namespace ZeroGames.Forge.Runtime;
 public class RegistryFactory : IRegistryFactory
 {
 
-	public object Create(IForgeDocumentSource source, params IEnumerable<IRegistry> imports)
+	public object Create(IFmlDocumentSource source, params IEnumerable<IRegistry> imports)
 	{
 		Type registryType = source.Document.RegistryType;
 		
@@ -19,7 +19,7 @@ public class RegistryFactory : IRegistryFactory
 			throw new ArgumentOutOfRangeException(nameof(registryType));
 		}
 
-		XDocument document = source.Document.FmlDocument;
+		XDocument document = source.Document.Document;
 		if (document.Root?.Name != registryType.Name)
 		{
 			throw new InvalidOperationException($"Document root does not match registry type {registryType.Name}.");

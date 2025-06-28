@@ -4,6 +4,6 @@ using System.Xml.Linq;
 
 namespace ZeroGames.Forge.Runtime;
 
-public readonly record struct ForgeDocument(Type RegistryType, XDocument FmlDocument);
+public readonly record struct FmlDocument(Type RegistryType, XDocument Document);
 
 
