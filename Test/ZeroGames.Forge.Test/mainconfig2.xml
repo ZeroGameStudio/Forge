@@ -123,10 +123,8 @@
                 </Element>
             </AttributeMap>
             <AttachPoint>
-                <Point2D>
-                    <X>1000</X>
-                    <Y>2000</Y>
-                </Point2D>
+                <X>1000</X>
+                <Y>2000</Y>
             </AttachPoint>
             <Defence>10</Defence>
             <Icon></Icon>

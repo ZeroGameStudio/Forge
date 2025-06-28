@@ -303,7 +303,8 @@ internal class RepositoryFactory
 				throw new InvalidOperationException();
 			}
 			
-			foreach (var property in implementationType.GetProperties().Where(p => p.GetCustomAttribute<PropertyAttribute>() is not null))
+			StructMetadata.Get(implementationType, out var metadata);
+			foreach (var property in metadata.Properties)
 			{
 				Type propertyType = property.PropertyType;
 				XElement? innerPropertyElement = structElement.Element(property.Name);
@@ -325,10 +326,10 @@ internal class RepositoryFactory
 				return notnull ? throw new InvalidOperationException() : null;
 			}
 			
-			XElement? entityReferenceElement = propertyElement.Elements().SingleOrDefault();
-			Type implementationType = entityReferenceElement is not null ? SchemaHelper.GetImplementationType(type, entityReferenceElement.Name.ToString()) : type;
+			XElement entityReferenceElement = propertyElement.Elements().Single();
+			Type implementationType = SchemaHelper.GetImplementationType(type, entityReferenceElement.Name.ToString());
 			EntityMetadata.Get(implementationType, out var metadata);
-			string[] rawComponents = (entityReferenceElement ?? propertyElement).Value.Split(entityReferenceElement?.Attribute(FmlSyntax.SEP_ATTRIBUTE_NAME)?.Value ?? FmlSyntax.DEFAULT_REFERENCE_SEP);
+			string[] rawComponents = entityReferenceElement.Value.Split(entityReferenceElement?.Attribute(FmlSyntax.SEP_ATTRIBUTE_NAME)?.Value ?? FmlSyntax.DEFAULT_REFERENCE_SEP);
 			object primaryKey = MakePrimaryKey(metadata, rawComponents);
 			IEntity? entity = getEntity(implementationType, primaryKey);
 			if (notnull && entity is null)

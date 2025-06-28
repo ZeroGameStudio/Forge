@@ -75,6 +75,7 @@ public class RegistryMetadata
 
 			metadata = new()
 			{
+				RegistryType = registryType,
 				Imports = imports,
 				Repositories = repositories,
 				AutoIndices = autoIndices,
@@ -85,6 +86,7 @@ public class RegistryMetadata
 	
 	public static void Get<T>(out RegistryMetadata metadata) where T : class, IRegistry => Get(typeof(T), out metadata);
     
+	public required Type RegistryType { get; init; }
     public required IReadOnlyList<PropertyInfo> Imports { get; init; }
     public required IReadOnlyList<PropertyInfo> Repositories { get; init; }
     public required IReadOnlyList<PropertyInfo> AutoIndices { get; init; }

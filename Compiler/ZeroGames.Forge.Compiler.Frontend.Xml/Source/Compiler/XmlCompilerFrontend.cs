@@ -92,6 +92,8 @@ public sealed partial class XmlCompilerFrontend : ICompilerFrontend
 			}
 		}
 		
+		// TODO: Check Type and Property name conflict.
+		
 		return schema;
 	}
 

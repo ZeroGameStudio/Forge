@@ -25,59 +25,171 @@ public class FmlxCompiler
                 throw new ArgumentOutOfRangeException(nameof(source));
             }
 
+            EntityMetadata? metadata = null;
             foreach (var entityElement in repositoryElement.Elements())
             {
                 if (entityElement.Name != entityTypeName)
                 {
                     throw new InvalidOperationException($"Entity element name {entityElement.Name} mismatch to required {entityType.Name}.");
                 }
+
+                if (metadata is null)
+                {
+                    EntityMetadata.Get(entityType, out var meta);
+                    metadata = meta;
+                }
                 
-                CompileEntity(entityType, entityElement);
+                CompileEntity(metadata, entityElement);
             }
         }
 
         return source with { Document = result };
     }
 
-    private void CompileEntity(Type entityType, XElement entityElement)
+    private void CompileEntity(EntityMetadata metadata, XElement entityElement)
     {
-        EntityMetadata.Get(entityType, out var metadata);
+        // IMPORTANT: DO NOT CHANGE ORDER!
+        DecayMapKeyAndAddExplicitPropertyType(metadata, entityElement);
+        
+        // TODO: Serialized struct/container.
+    }
 
-        // 1. Map key as attribute.
-        foreach (var property in metadata.RemainingProperties)
+    private void DecayMapKeyAndAddExplicitPropertyType(ICompositeDataTypeMetadata metadata, XElement dataElement)
+    {
+        // Modify the map <Element> element so that it has <Key> and <Value> elements under it without Key attribute.
+        static void EnsureMapKeyDecayed(XElement element)
         {
-            if (property.PropertyType.IsAssignableToSomeGenericInstanceOf(typeof(IReadOnlyDictionary<,>)))
+            if (element.Attribute(FmlSyntax.MAP_KEY_ELEMENT_NAME) is { } keyAttribute)
             {
-                string propertyName = property.Name;
-                if (entityElement.Element(propertyName) is { } propertyElement)
+                string key = keyAttribute.Value;
+                XElement keyElement = new(FmlSyntax.MAP_KEY_ELEMENT_NAME, key);
+                            
+                element.SetAttributeValue(FmlSyntax.MAP_KEY_ELEMENT_NAME, null);
+
+                XElement valueElement = new XElement(element) { Name = FmlSyntax.MAP_VALUE_ELEMENT_NAME };
+
+                element.RemoveNodes();
+                element.Add(keyElement, valueElement);
+            }
+        }
+        
+        // Modify the reference/struct <SomeProperty> element so that it has an explicit type element under it.
+        static void EnsurePropertyTyped(XElement propertyElement, Type propertyType, out Type actualType)
+        {
+            actualType = propertyType;
+            
+            bool untyped = true;
+            if (propertyType.IsAssignableTo(typeof(IEntity)))
+            {
+                if (propertyElement.HasElements)
+                {
+                    untyped = false;
+                }
+            }
+            else if (propertyType.IsAssignableTo(typeof(IStruct)))
+            {
+                if (propertyType.IsAbstract)
+                {
+                    throw new InvalidOperationException("Cannot use untyped struct for abstract property.");
+                }
+
+                if (propertyElement.Elements().Count() == 1 && SchemaHelper.GetDataType(propertyType, propertyElement.Elements().Single().Name.ToString()) is { } maybeType && maybeType.IsAssignableTo(propertyType))
+                {
+                    untyped = false;
+                    actualType = maybeType;
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Impossible code path.");
+            }
+
+            if (untyped)
+            {
+                XElement typedElement = new XElement(propertyElement) { Name = propertyType.Name };
+                propertyElement.RemoveNodes();
+                propertyElement.Add(typedElement);
+            }
+        }
+
+        static void ConditionallyRecurseStruct(FmlxCompiler @this, XElement propertyElement, Type structType)
+        {
+            if (!structType.IsAssignableTo(typeof(IStruct)))
+            {
+                return;
+            }
+            
+            XElement structElement = propertyElement.Elements().Single();
+            StructMetadata.Get(structType, out var structMetadata);
+            @this.DecayMapKeyAndAddExplicitPropertyType(structMetadata, structElement);
+        }
+        
+        foreach (var property in metadata.MapProperties.Concat(metadata.CompositeProperties).Distinct())
+        {
+            Type propertyType = property.PropertyType;
+            string propertyName = property.Name;
+            if (dataElement.Element(propertyName) is { } propertyElement)
+            {
+                if (propertyType.IsAssignableTo(typeof(IEntity)))
+                {
+                    EnsurePropertyTyped(propertyElement, propertyType, out _);
+                }
+                else if (propertyType.IsAssignableTo(typeof(IStruct)))
+                {
+                    EnsurePropertyTyped(propertyElement, propertyType, out var structType);
+                    ConditionallyRecurseStruct(this, propertyElement, structType);
+                }
+                else if (propertyType.GetGenericInstanceOf(typeof(IReadOnlyList<>)) is { } genericListType)
                 {
                     foreach (var element in propertyElement.Elements())
                     {
-                        if (element.Attribute(FmlSyntax.MAP_KEY_ELEMENT_NAME) is { } keyAttribute)
+                        if (element.Name != FmlSyntax.CONTAINER_ELEMENT_ELEMENT_NAME)
                         {
-                            string key = keyAttribute.Value;
-                            XElement keyElement = new(FmlSyntax.MAP_KEY_ELEMENT_NAME, key);
-                            
-                            element.SetAttributeValue(FmlSyntax.MAP_KEY_ELEMENT_NAME, null);
+                            throw new InvalidOperationException($"Unexpected element {element.Name} in container.");
+                        }
 
-                            XElement valueElement = new XElement(element) { Name = FmlSyntax.MAP_VALUE_ELEMENT_NAME };
+                        EnsurePropertyTyped(element, genericListType.GetGenericArguments()[0], out var maybeStructType);
+                        ConditionallyRecurseStruct(this, element, maybeStructType);
+                    }
+                }
+                else if (propertyType.GetGenericInstanceOf(typeof(IReadOnlySet<>)) is { } genericSetType)
+                {
+                    foreach (var element in propertyElement.Elements())
+                    {
+                        if (element.Name != FmlSyntax.CONTAINER_ELEMENT_ELEMENT_NAME)
+                        {
+                            throw new InvalidOperationException($"Unexpected element {element.Name} in container.");
+                        }
 
-                            element.RemoveNodes();
-                            element.Add(keyElement, valueElement);
+                        EnsurePropertyTyped(element, genericSetType.GetGenericArguments()[0], out var maybeStructType);
+                        ConditionallyRecurseStruct(this, element, maybeStructType);
+                    }
+                }
+                else if (propertyType.GetGenericInstanceOf(typeof(IReadOnlyDictionary<,>)) is { } genericMapType)
+                {
+                    // Map has been flattened to standard FML syntax so we can get <Value> element.
+                    foreach (var element in propertyElement.Elements())
+                    {
+                        if (element.Name != FmlSyntax.CONTAINER_ELEMENT_ELEMENT_NAME)
+                        {
+                            throw new InvalidOperationException($"Unexpected element {element.Name} in container.");
+                        }
+                        
+                        // Ensure key attribute is decayed first so it must have <Value> element under it.
+                        EnsureMapKeyDecayed(element);
+                        
+                        // Note that we concat all map properties so it may not be a struct map.
+                        Type valueType = genericMapType.GetGenericArguments()[1];
+                        if (valueType.IsAssignableTo(typeof(IEntity)) || valueType.IsAssignableTo(typeof(IStruct)))
+                        {
+                            XElement valueElement = element.Element(FmlSyntax.MAP_VALUE_ELEMENT_NAME)!;
+                            EnsurePropertyTyped(valueElement, genericMapType.GetGenericArguments()[0], out var maybeStructType);
+                            ConditionallyRecurseStruct(this, valueElement, maybeStructType);
                         }
                     }
                 }
             }
         }
-        
-        // 2. Untyped reference/struct.
-        
-        
-        /*
-         * TODO: Compile fmlx document object to fml document object.
-         * 3. Serialized struct.
-         * 4. Serialized container.
-         */
     }
 
 }

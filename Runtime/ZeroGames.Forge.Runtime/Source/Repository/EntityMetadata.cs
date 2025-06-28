@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace ZeroGames.Forge.Runtime;
 
-public class EntityMetadata
+public class EntityMetadata : ICompositeDataTypeMetadata
 {
     
     public static void Get(Type entityType, out EntityMetadata metadata)
@@ -26,6 +26,7 @@ public class EntityMetadata
             PrimaryKeyAttribute primaryKeyAttribute = entityType.GetCustomAttribute<PrimaryKeyAttribute>()!;
             metadata = new()
             {
+                EntityType = entityType,
                 PrimaryKeyComponents = primaryKeyAttribute.Components.Select(component => entityType.GetProperty(component)!).ToArray(),
                 RemainingProperties = entityType.GetProperties().Where(property => property.GetCustomAttribute<PropertyAttribute>() is not null && !primaryKeyAttribute.Components.Contains(property.Name)).ToArray(),
             };
@@ -35,13 +36,12 @@ public class EntityMetadata
     
     public static void Get<T>(out EntityMetadata metadata) where T : class, IEntity => Get(typeof(T), out metadata);
     
+    public required Type EntityType { get; init; }
     public required IReadOnlyList<PropertyInfo> PrimaryKeyComponents { get; init; }
     public required IReadOnlyList<PropertyInfo> RemainingProperties { get; init; }
 
     [field: MaybeNull]
-    public IReadOnlyList<PropertyInfo> Properties => field ??= PrimaryKeyComponents.Concat(RemainingProperties).ToArray();
-
-    public Type PrimaryKeyType => PrimaryKeyComponents.Count switch
+    public Type PrimaryKeyType => field ??= PrimaryKeyComponents.Count switch
     {
         1 => PrimaryKeyComponents[0].PropertyType,
         2 => typeof(ValueTuple<,>).MakeGenericType(PrimaryKeyComponents.Select(property => property.PropertyType).ToArray()),
@@ -55,5 +55,20 @@ public class EntityMetadata
     
     private static readonly Dictionary<Type, EntityMetadata> _cache = new();
     private static readonly Lock _cacheLock = new();
+    
+    #region ICompositeDataTypeMetadata Interfaces
+
+    Type ICompositeDataTypeMetadata.DataType => EntityType;
+    
+    [field: MaybeNull]
+    public IReadOnlyList<PropertyInfo> Properties => field ??= PrimaryKeyComponents.Concat(RemainingProperties).ToArray();
+
+    [field: MaybeNull]
+    public IReadOnlyList<PropertyInfo> MapProperties => field ??= RemainingProperties.Where(property => property.PropertyType.IsAssignableToSomeGenericInstanceOf(typeof(IReadOnlyDictionary<,>))).ToArray();
+
+    [field: MaybeNull]
+    public IReadOnlyList<PropertyInfo> CompositeProperties => field ??= RemainingProperties.Where(ICompositeDataTypeMetadata.IsCompositeProperty).ToArray();
+    
+    #endregion
     
 }
