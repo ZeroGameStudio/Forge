@@ -3,6 +3,6 @@
 namespace ZeroGames.Forge.Runtime;
 
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class PropertyAttribute : Attribute;
+public sealed class ForgePropertyAttribute : Attribute;
 
 

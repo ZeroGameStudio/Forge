@@ -28,7 +28,7 @@ public class EntityMetadata : ICompositeDataTypeMetadata
             {
                 EntityType = entityType,
                 PrimaryKeyComponents = primaryKeyAttribute.Components.Select(component => entityType.GetProperty(component)!).ToArray(),
-                RemainingProperties = entityType.GetProperties().Where(property => property.GetCustomAttribute<PropertyAttribute>() is not null && !primaryKeyAttribute.Components.Contains(property.Name)).ToArray(),
+                RemainingProperties = entityType.GetProperties().Where(property => property.GetCustomAttribute<ForgePropertyAttribute>() is not null && !primaryKeyAttribute.Components.Contains(property.Name)).ToArray(),
             };
             _cache[entityType] = metadata;
         }

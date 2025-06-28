@@ -26,7 +26,7 @@ public class StructMetadata : ICompositeDataTypeMetadata
             metadata = new()
             {
                 StructType = structType,
-                Properties = structType.GetProperties().Where(property => property.GetCustomAttribute<PropertyAttribute>() is not null).ToArray(),
+                Properties = structType.GetProperties().Where(property => property.GetCustomAttribute<ForgePropertyAttribute>() is not null).ToArray(),
             };
             _cache[structType] = metadata;
         }

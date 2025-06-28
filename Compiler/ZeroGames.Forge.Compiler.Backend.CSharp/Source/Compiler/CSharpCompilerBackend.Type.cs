@@ -150,11 +150,11 @@ public {GetAbstractModifierCode(type)}{GetPartialModifierCode(type)}{GetTypeKind
 		{
 			if (type is IInterfaceDataType)
 			{
-				return $"[Property]{Environment.NewLine}{GetTypeNameCode(property.Type)} {property.Name} {{ get; }}";
+				return $"[ForgeProperty]{Environment.NewLine}{GetTypeNameCode(property.Type)} {property.Name} {{ get; }}";
 			}
 			else
 			{
-				return $"[Property]{Environment.NewLine}public required {GetTypeNameCode(property.Type)} {property.Name} {{ get; init; }}";
+				return $"[ForgeProperty]{Environment.NewLine}public required {GetTypeNameCode(property.Type)} {property.Name} {{ get; init; }}";
 			}
 		}));
 	}
