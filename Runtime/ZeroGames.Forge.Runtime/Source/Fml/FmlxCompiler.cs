@@ -74,7 +74,7 @@ public class FmlxCompiler
         }
         
         // Modify the reference/struct <SomeProperty> element so that it has an explicit type element under it.
-        static void EnsurePropertyTyped(XElement propertyElement, Type propertyType, out Type actualType)
+        static void EnsurePropertyTyped(XElement propertyElement, Type propertyType, out Type? actualType)
         {
             actualType = propertyType;
             
@@ -85,6 +85,11 @@ public class FmlxCompiler
                 {
                     untyped = false;
                 }
+                else if (string.IsNullOrEmpty(propertyElement.Value))
+                {
+                    untyped = false;
+                    actualType = null;
+                }
             }
             else if (propertyType.IsAssignableTo(typeof(IStruct)))
             {
@@ -93,7 +98,12 @@ public class FmlxCompiler
                     throw new InvalidOperationException("Cannot use untyped struct for abstract property.");
                 }
 
-                if (propertyElement.Elements().Count() == 1 && SchemaHelper.GetDataType(propertyType, propertyElement.Elements().Single().Name.ToString()) is { } maybeType && maybeType.IsAssignableTo(propertyType))
+                if (!propertyElement.HasElements)
+                {
+                    untyped = false;
+                    actualType = null;
+                }
+                else if (propertyElement.Elements().Count() == 1 && SchemaHelper.GetDataType(propertyType, propertyElement.Elements().Single().Name.ToString()) is { } maybeType && maybeType.IsAssignableTo(propertyType))
                 {
                     untyped = false;
                     actualType = maybeType;
@@ -112,9 +122,9 @@ public class FmlxCompiler
             }
         }
 
-        static void ConditionallyRecurseStruct(FmlxCompiler @this, XElement propertyElement, Type structType)
+        static void ConditionallyRecurseStruct(FmlxCompiler @this, XElement propertyElement, Type? structType)
         {
-            if (!structType.IsAssignableTo(typeof(IStruct)))
+            if (structType is null || !structType.IsAssignableTo(typeof(IStruct)))
             {
                 return;
             }
@@ -183,7 +193,7 @@ public class FmlxCompiler
                         if (valueType.IsAssignableTo(typeof(IEntity)) || valueType.IsAssignableTo(typeof(IStruct)))
                         {
                             XElement valueElement = element.Element(FmlSyntax.MAP_VALUE_ELEMENT_NAME)!;
-                            EnsurePropertyTyped(valueElement, genericMapType.GetGenericArguments()[0], out var maybeStructType);
+                            EnsurePropertyTyped(valueElement, valueType, out var maybeStructType);
                             ConditionallyRecurseStruct(this, valueElement, maybeStructType);
                         }
                     }

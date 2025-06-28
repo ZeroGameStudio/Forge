@@ -278,7 +278,7 @@ internal class RepositoryFactory
 	private object? SerializeNonContainer(Type type, XElement propertyElement, ReturnNotNull? returnNotNull, GetEntityDelegate getEntity)
 	{
 		bool notnull = returnNotNull is not null;
-		bool empty = string.IsNullOrEmpty(propertyElement.Value);
+		bool empty = string.IsNullOrEmpty(propertyElement.Value) && !propertyElement.HasElements;
 		if (type.IsEnum)
 		{
 			if (empty)

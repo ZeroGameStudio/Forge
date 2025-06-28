@@ -30,4 +30,32 @@
         <Element Name="Mana" Value="1" />
     </Enum>
 
+    <Struct Name="StructWithCollection1">
+        <Property Type="StructWithCollection2[]" Name="List" />
+        <Property Type="StructWithCollection2{}" Name="Set" />
+        <Property Type="int32->StructWithCollection2" Name="Map" />
+        <Property Type="StructWithCollection2" Name="Struct" />
+        <Property Type="StructWithCollection2?" Name="OptionalStruct" />
+    </Struct>
+
+    <Struct Name="StructWithCollection1Sub" Extends="StructWithCollection1">
+        <Property Type="string[]" Name="StrList" />
+    </Struct>
+
+    <Struct Name="StructWithCollection2">
+        <Property Type="int32[]" Name="List" />
+        <Property Type="int32{}" Name="Set" />
+        <Property Type="int32->Point2D" Name="Map" />
+        <Property Type="string" Name="Str" />
+    </Struct>
+
+    <Entity Name="EntityWithCollection">
+        <Property Type="uint64" Name="Id" />
+        <Property Type="StructWithCollection1[]" Name="List" />
+        <Property Type="StructWithCollection1{}" Name="Set" />
+        <Property Type="int32->StructWithCollection1" Name="Map" />
+        <Property Type="StructWithCollection1" Name="Struct" />
+        <Property Type="StructWithCollection1?" Name="OptionalStruct" />
+    </Entity>
+
 </Schema>

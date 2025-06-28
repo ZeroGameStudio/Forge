@@ -17,6 +17,342 @@
         
     </ConstantRepository>
     
+    <EntityWithCollectionRepository>
+        
+        <EntityWithCollection>
+            <Id>1</Id>
+            
+            
+            
+            <List>
+                <Element>
+                    <List></List>
+                    <Set></Set>
+                    <Map></Map>
+                    <Struct>
+                        <List></List>
+                        <Set></Set>
+                        <Map></Map>
+                        <Str></Str>
+                    </Struct>
+                    <OptionalStruct></OptionalStruct>
+                </Element>
+                <Element>
+                    <StructWithCollection1>
+                        <List></List>
+                        <Set></Set>
+                        <Map></Map>
+                        <Struct>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Str></Str>
+                        </Struct>
+                        <OptionalStruct></OptionalStruct>
+                    </StructWithCollection1>
+                </Element>
+                <Element>
+                    <StructWithCollection1Sub>
+                        <List></List>
+                        <Set></Set>
+                        <Map></Map>
+                        <Struct>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Str></Str>
+                        </Struct>
+                        <OptionalStruct></OptionalStruct>
+                        <StrList>
+                            <Element>123</Element>
+                            <Element>12d s ds f,,,3</Element>
+                        </StrList>
+                    </StructWithCollection1Sub>
+                </Element>
+            </List>
+            
+            
+            
+            <Set>
+                <Element>
+                    <List></List>
+                    <Set></Set>
+                    <Map></Map>
+                    <Struct>
+                        <List></List>
+                        <Set></Set>
+                        <Map></Map>
+                        <Str></Str>
+                    </Struct>
+                    <OptionalStruct></OptionalStruct>
+                </Element>
+                <Element>
+                    <StructWithCollection1>
+                        <List></List>
+                        <Set></Set>
+                        <Map></Map>
+                        <Struct>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Str></Str>
+                        </Struct>
+                        <OptionalStruct></OptionalStruct>
+                    </StructWithCollection1>
+                </Element>
+                <Element>
+                    <StructWithCollection1Sub>
+                        <List></List>
+                        <Set></Set>
+                        <Map></Map>
+                        <Struct>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Str></Str>
+                        </Struct>
+                        <OptionalStruct></OptionalStruct>
+                        <StrList>
+                            <Element>123</Element>
+                            <Element>12d s ds f,,,3</Element>
+                        </StrList>
+                    </StructWithCollection1Sub>
+                </Element>
+            </Set>
+            
+            
+            
+            <Map>
+                <Element Key="123">
+                    <List></List>
+                    <Set></Set>
+                    <Map></Map>
+                    <Struct>
+                        <List></List>
+                        <Set></Set>
+                        <Map></Map>
+                        <Str></Str>
+                    </Struct>
+                    <OptionalStruct></OptionalStruct>
+                </Element>
+                <Element Key="456">
+                    <StructWithCollection1>
+                        <List>
+                            <Element>
+                                <StructWithCollection2>
+                                    <List></List>
+                                    <Set></Set>
+                                    <Map></Map>
+                                    <Str></Str>
+                                </StructWithCollection2>
+                            </Element>
+                        </List>
+
+
+
+                        <Set>
+                            <Element>
+                                <StructWithCollection2>
+                                    <List></List>
+                                    <Set></Set>
+                                    <Map></Map>
+                                    <Str></Str>
+                                </StructWithCollection2>
+                            </Element>
+                        </Set>
+
+
+
+                        <Map>
+                            <Element>
+                                <Key>123</Key>
+                                <Value>
+                                    <StructWithCollection2>
+                                        <List></List>
+                                        <Set></Set>
+                                        <Map></Map>
+                                        <Str></Str>
+                                    </StructWithCollection2>
+                                </Value>
+                            </Element>
+
+                            <Element>
+                                <Key>456</Key>
+                                <Value>
+                                    <List></List>
+                                    <Set></Set>
+                                    <Map></Map>
+                                    <Str>sdf 1a5sd 0fasd f01a5df1a 0.f aw0+efaw</Str>
+                                </Value>
+                            </Element>
+                        </Map>
+
+
+
+                        <Struct>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Str></Str>
+                        </Struct>
+
+
+
+                        <OptionalStruct>
+                            <List></List>
+                            <Set></Set>
+                            <Map>
+                                <Element>
+                                    <Key>100</Key>
+                                    <Value>
+                                        <X>1000</X>
+                                        <Y>2000</Y>
+                                    </Value>
+                                </Element>
+                                <Element Key="200">
+                                    <Point2D>
+                                        <X>1000</X>
+                                        <Y>2000</Y>
+                                    </Point2D>
+                                </Element>
+                                <Element Key="200">
+                                    <Point3D>
+                                        <X>1000</X>
+                                        <Y>2000</Y>
+                                        <Z>3000</Z>
+                                    </Point3D>
+                                </Element>
+                            </Map>
+                            <Str></Str>
+                        </OptionalStruct>
+                    </StructWithCollection1>
+                </Element>
+                <Element>
+                    <Key>77777</Key>
+                    <Value>
+                        <StructWithCollection1Sub>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Struct>
+                                <List></List>
+                                <Set></Set>
+                                <Map></Map>
+                                <Str></Str>
+                            </Struct>
+                            <OptionalStruct></OptionalStruct>
+                            <StrList>
+                                <Element>123</Element>
+                                <Element>12d s ds f,,,3</Element>
+                            </StrList>
+                        </StructWithCollection1Sub>
+                    </Value>
+                </Element>
+            </Map>
+            
+            
+            
+            <Struct>
+                
+                
+                
+                <List>
+                    <Element>
+                        <StructWithCollection2>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Str></Str>
+                        </StructWithCollection2>
+                    </Element>
+                </List>
+                
+                
+                
+                <Set>
+                    <Element>
+                        <StructWithCollection2>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Str></Str>
+                        </StructWithCollection2>
+                    </Element>
+                </Set>
+                
+                
+                
+                <Map>
+                    <Element>
+                        <Key>123</Key>
+                        <Value>
+                            <StructWithCollection2>
+                                <List></List>
+                                <Set></Set>
+                                <Map></Map>
+                                <Str></Str>
+                            </StructWithCollection2>
+                        </Value>
+                    </Element>
+                    
+                    <Element>
+                        <Key>456</Key>
+                        <Value>
+                            <List></List>
+                            <Set></Set>
+                            <Map></Map>
+                            <Str>sdf 1a5sd 0fasd f01a5df1a 0.f aw0+efaw</Str>
+                        </Value>
+                    </Element>
+                </Map>
+                
+                
+                
+                <Struct>
+                    <List></List>
+                    <Set></Set>
+                    <Map></Map>
+                    <Str></Str>
+                </Struct>
+                
+                
+                
+                <OptionalStruct>
+                    <List></List>
+                    <Set></Set>
+                    <Map>
+                        <Element>
+                            <Key>100</Key>
+                            <Value>
+                                <X>1000</X>
+                                <Y>2000</Y>
+                            </Value>
+                        </Element>
+                        <Element Key="200">
+                            <Point2D>
+                                <X>1000</X>
+                                <Y>2000</Y>
+                            </Point2D>
+                        </Element>
+                        <Element Key="200">
+                            <Point3D>
+                                <X>1000</X>
+                                <Y>2000</Y>
+                                <Z>3000</Z>
+                            </Point3D>
+                        </Element>
+                    </Map>
+                    <Str></Str>
+                </OptionalStruct>
+            </Struct>
+            
+            
+            
+            <OptionalStruct></OptionalStruct>
+        </EntityWithCollection>
+        
+    </EntityWithCollectionRepository>
+    
 </SharedRegistry>
 
 
