@@ -1,26 +1,24 @@
 ﻿// Copyright Zero Games. All Rights Reserved.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Xml.Linq;
 
 namespace ZeroGames.Forge.Runtime;
 
-public class FmlDocumentTransformer(IFmlDocumentSource source, params IEnumerable<IFmltDocumentSource> transformers) : IFmlDocumentSource
+public class FmlDocumentTransformer(IForgeDocumentSource source, params IEnumerable<IFmltDocumentSource> transformers) : IForgeDocumentSource
 {
 
-    [field: MaybeNull]
-    public XDocument Document => field ??= Transform();
+    public ForgeDocument Document => field == default ? field = Transform() : field;
 
-    private XDocument Transform()
+    private ForgeDocument Transform()
     {
-        XDocument result = new(_source.Document);
+        XDocument result = new(_source.Document.FmlDocument);
         
         // @TODO: Apply transforms.
 
-        return result;
+        return _source.Document with { FmlDocument = result };
     }
 
-    private readonly IFmlDocumentSource _source = source;
+    private readonly IForgeDocumentSource _source = source;
     private readonly IEnumerable<IFmltDocumentSource> _transformers = transformers;
     
 }

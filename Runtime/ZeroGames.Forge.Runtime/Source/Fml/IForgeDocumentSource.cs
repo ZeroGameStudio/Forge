@@ -4,9 +4,9 @@ using System.Xml.Linq;
 
 namespace ZeroGames.Forge.Runtime;
 
-public interface IFmltDocumentSource
+public interface IForgeDocumentSource
 {
-    public XDocument Document { get; }
+    public ForgeDocument Document { get; }
 }
 
 

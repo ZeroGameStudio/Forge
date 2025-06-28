@@ -4,9 +4,6 @@ using System.Xml.Linq;
 
 namespace ZeroGames.Forge.Runtime;
 
-public interface IXDocumentSource
-{
-    public XDocument Document { get; }
-}
+public readonly record struct ForgeDocument(Type RegistryType, XDocument FmlDocument);
 
 

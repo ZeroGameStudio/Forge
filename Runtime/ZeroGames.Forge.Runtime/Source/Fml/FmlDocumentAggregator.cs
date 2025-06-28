@@ -6,37 +6,40 @@ using System.Xml.Linq;
 
 namespace ZeroGames.Forge.Runtime;
 
-public class FmlDocumentAggregator : IFmlDocumentSource
+public class FmlDocumentAggregator : IForgeDocumentSource
 {
 
-    public FmlDocumentAggregator(Type registryType, params IEnumerable<IFmlDocumentSource> sources)
+    public FmlDocumentAggregator(params IEnumerable<IForgeDocumentSource> sources)
     {
-	    if (registryType.IsAbstract || !registryType.IsAssignableTo(typeof(IRegistry)))
+	    _sources = sources.ToList();
+	    if (_sources.Count == 0)
 	    {
-		    throw new ArgumentOutOfRangeException(nameof(registryType));
+		    throw new ArgumentOutOfRangeException(nameof(sources));
 	    }
-	    
-	    _registryType = registryType;
-	    _sources = sources;
+
+	    _registryType = _sources[0].Document.RegistryType;
+	    if (_registryType.IsAbstract || !_registryType.IsAssignableTo(typeof(IRegistry)))
+	    {
+		    throw new ArgumentOutOfRangeException(nameof(sources));
+	    }
     }
 
-    [field: MaybeNull]
-    public XDocument Document => field ??= Aggregate(_registryType, _sources);
+    public ForgeDocument Document => field == default ? field = Aggregate() : field;
 
     public bool AllowsMergeRepository { get; init; } = true;
     public bool AllowsOverrideEntity { get; init; } = true;
 
-    private XDocument Aggregate(Type registryType, IEnumerable<IFmlDocumentSource> sources)
+    private ForgeDocument Aggregate()
     {
-        XDocument result = new(new XElement(registryType.Name));
-		foreach (var source in sources.Select(s => s.Document))
+        XDocument result = new(new XElement(_registryType.Name));
+		foreach (var source in _sources.Select(s => s.Document.FmlDocument))
 		{
 			if (result.Root!.Name != source.Root?.Name)
 			{
 				throw new InvalidOperationException($"Source root node {source.Root?.Name} mismatch.");
 			}
 
-			DataTypesAttribute dataTypesAttribute = registryType.GetCustomAttribute<SchemaAttribute>()!.Schema.GetCustomAttribute<DataTypesAttribute>()!;
+			DataTypesAttribute dataTypesAttribute = _registryType.GetCustomAttribute<SchemaAttribute>()!.Schema.GetCustomAttribute<DataTypesAttribute>()!;
 			
 			foreach (var repository in source.Root.Elements())
 			{
@@ -109,16 +112,14 @@ public class FmlDocumentAggregator : IFmlDocumentSource
 			}
 		}
 
-        return result;
+        return new(_registryType, result);
     }
 
     private const string REPOSITORY_SUFFIX = "Repository";
     
     private readonly Type _registryType;
-    private readonly IEnumerable<IFmlDocumentSource> _sources;
+    private readonly List<IForgeDocumentSource> _sources;
     
 }
-
-public class FmlDocumentAggregator<T>(params IEnumerable<IFmlDocumentSource> sources) : FmlDocumentAggregator(typeof(T), sources) where T : class, IRegistry;
 
 

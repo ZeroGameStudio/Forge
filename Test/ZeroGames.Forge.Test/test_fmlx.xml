@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MainRegistry>
+    <CharacterRepository>
+        <Character>
+            <Id>101</Id>
+            <Name>Hero</Name>
+            <Level>50</Level>
+            
+            <!-- 使用Key属性语法糖的Map -->
+            <AttributeMap>
+                <Element Key="100">abc</Element>
+                <Element Key="200">zzz</Element>
+                <Element Key="300">def</Element>
+            </AttributeMap>
+            
+            <!-- 嵌套的Map结构 -->
+            <NestedMap>
+                <Element Key="level1">
+                    <InnerMap>
+                        <Element Key="level2">nested_value</Element>
+                        <Element Key="level3">another_value</Element>
+                    </InnerMap>
+                </Element>
+                <Element Key="level4">simple_value</Element>
+            </NestedMap>
+            
+            <!-- 复杂内容结构 -->
+            <ComplexMap>
+                <Element Key="weapon">
+                    <Weapon>
+                        <Id>1001</Id>
+                        <Damage>50</Damage>
+                        <Type>Sword</Type>
+                    </Weapon>
+                </Element>
+                <Element Key="armor">
+                    <Armor>
+                        <Id>2001</Id>
+                        <Defence>30</Defence>
+                        <Type>Plate</Type>
+                    </Armor>
+                </Element>
+            </ComplexMap>
+            
+            <!-- 不应该被转换的元素（非Map） -->
+            <SingleElement Key="should_not_convert">value</SingleElement>
+        </Character>
+        
+        <Character>
+            <Id>102</Id>
+            <Name>Mage</Name>
+            <Level>45</Level>
+            
+            <!-- 另一个Map示例 -->
+            <SpellMap>
+                <Element Key="fireball">Fireball Spell</Element>
+                <Element Key="icebolt">Ice Bolt Spell</Element>
+                <Element Key="lightning">Lightning Spell</Element>
+            </SpellMap>
+        </Character>
+    </CharacterRepository>
+</MainRegistry> 

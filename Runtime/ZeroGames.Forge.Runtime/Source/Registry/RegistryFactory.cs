@@ -8,8 +8,10 @@ namespace ZeroGames.Forge.Runtime;
 public class RegistryFactory : IRegistryFactory
 {
 
-	public object Create(Type registryType, IFmlDocumentSource source, params IEnumerable<IRegistry> imports)
+	public object Create(IForgeDocumentSource source, params IEnumerable<IRegistry> imports)
 	{
+		Type registryType = source.Document.RegistryType;
+		
 		Logger?.Invoke(ELogVerbosity.Log, $"Creating {registryType.Name}...");
 		
 		if (registryType.IsInterface || registryType.IsAbstract || !registryType.IsAssignableTo(typeof(IRegistry)))
@@ -17,7 +19,7 @@ public class RegistryFactory : IRegistryFactory
 			throw new ArgumentOutOfRangeException(nameof(registryType));
 		}
 
-		XDocument document = source.Document;
+		XDocument document = source.Document.FmlDocument;
 		if (document.Root?.Name != registryType.Name)
 		{
 			throw new InvalidOperationException($"Document root does not match registry type {registryType.Name}.");
@@ -149,77 +151,6 @@ public class RegistryFactory : IRegistryFactory
 		public required IReadOnlyList<PropertyInfo> Imports { get; init; }
 		public required IReadOnlyList<PropertyInfo> Repositories { get; init; }
 		public required IReadOnlyList<PropertyInfo> AutoIndices { get; init; }
-	}
-
-	private static XDocument Merge(IFmlDocumentSource[] sources, Type registryType)
-	{
-		XDocument result = new(new XElement(registryType.Name));
-		foreach (var source in sources.Select(s => s.Document))
-		{
-			if (result.Root!.Name != source.Root?.Name)
-			{
-				throw new InvalidOperationException($"Source root node {source.Root?.Name} mismatch.");
-			}
-
-			DataTypesAttribute dataTypesAttribute = registryType.GetCustomAttribute<SchemaAttribute>()!.Schema.GetCustomAttribute<DataTypesAttribute>()!;
-			
-			foreach (var repository in source.Root.Elements())
-			{
-				XElement? existingRepository = result.Root.Elements(repository.Name).SingleOrDefault();
-				if (existingRepository is null)
-				{
-					result.Root.Add(new XElement(repository));
-				}
-				else
-				{
-					string[]? primaryKeyComponents = null;
-					foreach (var entity in repository.Elements())
-					{
-						primaryKeyComponents ??= dataTypesAttribute[entity.Name.ToString()].GetCustomAttribute<PrimaryKeyAttribute>()!.Components.ToArray();
-						
-						string[] GetRawComponents(XElement element)
-							=> element
-								.Elements()
-								.Where(elem => primaryKeyComponents.Contains(elem.Name.ToString()))
-								.OrderBy(elem => primaryKeyComponents.IndexOf(elem.Name.ToString()))
-								.Select(elem => elem.Value)
-								.ToArray();
-						
-						string[] rawComponents = GetRawComponents(entity);
-						if (rawComponents.Length != primaryKeyComponents.Length)
-						{
-							throw new InvalidOperationException("Missing primary key.");
-						}
-
-						if (existingRepository.Elements().Any(existingEntity =>
-						    {
-							    string[] existingRawComponents = GetRawComponents(existingEntity);
-							    if (existingRawComponents.Length != rawComponents.Length)
-							    {
-								    return false;
-							    }
-							    
-							    for (int32 i = 0; i < existingRawComponents.Length; ++i)
-							    {
-								    if (existingRawComponents[i] != rawComponents[i])
-								    {
-									    return false;
-								    }
-							    }
-
-							    return true;
-						    }))
-						{
-							throw new InvalidOperationException($"Duplicated primary key {{{string.Join(", ", rawComponents)}}}.");
-						}
-						
-						existingRepository.Add(new XElement(entity));
-					}
-				}
-			}
-		}
-
-		return result;
 	}
 
 	private static void GetRegistryMetadata(Type registryType, out RegistryMetadata metadata)
