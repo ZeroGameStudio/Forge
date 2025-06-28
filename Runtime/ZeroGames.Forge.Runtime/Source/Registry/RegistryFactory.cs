@@ -30,7 +30,7 @@ public class RegistryFactory : IRegistryFactory
 		var registry = (IRegistry)Activator.CreateInstance(registryType)!;
 		(registry as INotifyInitialization)?.PreInitialize();
 
-		GetRegistryMetadata(registryType, out var metadata);
+		RegistryMetadata.Get(registryType, out var metadata);
 		
 		Dictionary<Type, IRepository> repositoryByEntityType = [];
 		{ // Stage I: Fill import registries
@@ -54,7 +54,7 @@ public class RegistryFactory : IRegistryFactory
 			
 				importProperty.SetValue(registry, import);
 				
-				GetRegistryMetadata(importType, out var importMetadata);
+				RegistryMetadata.Get(importType, out var importMetadata);
 				foreach (var repositoryProperty in importMetadata.Repositories)
 				{
 					Type repositoryType = repositoryProperty.PropertyType;
@@ -145,86 +145,6 @@ public class RegistryFactory : IRegistryFactory
 	}
 	
 	public Action<ELogVerbosity, object?>? Logger { get; init; }
-
-	private readonly struct RegistryMetadata
-	{
-		public required IReadOnlyList<PropertyInfo> Imports { get; init; }
-		public required IReadOnlyList<PropertyInfo> Repositories { get; init; }
-		public required IReadOnlyList<PropertyInfo> AutoIndices { get; init; }
-	}
-
-	private static void GetRegistryMetadata(Type registryType, out RegistryMetadata metadata)
-	{
-		lock (_metadataLock)
-		{
-			if (_metadata.TryGetValue(registryType, out metadata))
-			{
-				return;
-			}
-			
-			List<PropertyInfo> imports = [];
-			List<PropertyInfo> repositories = [];
-			List<PropertyInfo> autoIndices = [];
-
-			foreach (var property in registryType.GetProperties())
-			{
-				Type propertyType = property.PropertyType;
-				if (property.GetCustomAttribute<ImportAttribute>() is not null)
-				{
-					if (property.SetMethod is null)
-					{
-						throw new InvalidOperationException($"Property {property.Name} is readonly.");
-					}
-					
-					if (!propertyType.IsAssignableTo(typeof(IRegistry)))
-					{
-						throw new InvalidOperationException($"Property type {propertyType.Name} does not implement IRegistry.");
-					}
-				
-					imports.Add(property);
-				}
-				else if (property.GetCustomAttribute<RepositoryAttribute>() is not null)
-				{
-					if (property.SetMethod is null)
-					{
-						throw new InvalidOperationException($"Property {property.Name} is readonly.");
-					}
-					
-					if (!propertyType.GetInterfaces().Append(propertyType).Any(interfaceType => interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof(IRepository<,>)))
-					{
-						throw new InvalidOperationException($"Property type {propertyType.Name} does not implement IRepository<,>.");
-					}
-				
-					repositories.Add(property);
-				}
-				else if (property.GetCustomAttribute<AutoIndexAttribute>() is not null)
-				{
-					if (property.SetMethod is null)
-					{
-						throw new InvalidOperationException($"Property {property.Name} is readonly.");
-					}
-					
-					if (!propertyType.IsAssignableTo(typeof(IIndex)))
-					{
-						throw new InvalidOperationException($"Property type {propertyType.Name} does not implement IIndex.");
-					}
-				
-					autoIndices.Add(property);
-				}
-			}
-
-			metadata = new()
-			{
-				Imports = imports,
-				Repositories = repositories,
-				AutoIndices = autoIndices,
-			};
-			_metadata[registryType] = metadata;
-		}
-	}
-
-	private static readonly Dictionary<Type, RegistryMetadata> _metadata = new();
-	private static readonly Lock _metadataLock = new();
 
 }
 

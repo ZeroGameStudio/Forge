@@ -18,7 +18,6 @@ var mainSource = new FmlDocumentTransformer
 );
 var mainRegistry = new RegistryFactory().Create<MainRegistry>(mainSource, sharedRegistry);
 
-Console.WriteLine("所有测试完成，按任意键退出...");
 Console.ReadKey();
 Console.WriteLine("exit...");
 

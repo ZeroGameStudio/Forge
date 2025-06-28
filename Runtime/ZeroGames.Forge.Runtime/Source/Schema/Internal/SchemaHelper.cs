@@ -18,6 +18,13 @@ internal static class SchemaHelper
 		Type implementationType = rootTypeSchema.GetCustomAttribute<DataTypesAttribute>()![implementationTypeName];
 		return !implementationType.IsAbstract && implementationType.IsAssignableTo(rootType) ? implementationType : throw new InvalidOperationException();
 	}
+
+	public static Type? GetDataType(Type schemaContextType, string dataTypeName)
+	{
+		Type schemaType = schemaContextType.GetCustomAttribute<SchemaAttribute>()!.Schema;
+		DataTypesAttribute dataTypesAttr = schemaType.GetCustomAttribute<DataTypesAttribute>()!;
+		return dataTypesAttr.Types.SingleOrDefault(type => type.Name == dataTypeName);
+	}
 	
 }
 

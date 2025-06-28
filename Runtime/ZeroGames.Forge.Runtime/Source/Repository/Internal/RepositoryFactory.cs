@@ -25,7 +25,7 @@ internal class RepositoryFactory
 		Logger?.Invoke(ELogVerbosity.Log, $"Creating {entityType.Name}Repository...");
 		
 		IInitializingRepository repository = AllocateRepository(registry, entityType);
-		GetEntityMetadata(entityType, out var metadata);
+		EntityMetadata.Get(entityType, out var metadata);
 
 		Logger?.Invoke(ELogVerbosity.Log, "Allocating entities...");
 		Dictionary<IEntity, XElement> pendingInitializedEntities = [];
@@ -170,47 +170,10 @@ internal class RepositoryFactory
 		public static ReturnNotNull True => default;
 		public static ReturnNotNull? False => null;
 	}
-	
-	private readonly struct EntityMetadata
-	{
-		public required IReadOnlyList<PropertyInfo> PrimaryKeyComponents { get; init; }
-		public required IReadOnlyList<PropertyInfo> RemainingProperties { get; init; }
-
-		public Type PrimaryKeyType => PrimaryKeyComponents.Count switch
-		{
-			1 => PrimaryKeyComponents[0].PropertyType,
-			2 => typeof(ValueTuple<,>).MakeGenericType(PrimaryKeyComponents.Select(property => property.PropertyType).ToArray()),
-			3 => typeof(ValueTuple<,,>).MakeGenericType(PrimaryKeyComponents.Select(property => property.PropertyType).ToArray()),
-			4 => typeof(ValueTuple<,,,>).MakeGenericType(PrimaryKeyComponents.Select(property => property.PropertyType).ToArray()),
-			5 => typeof(ValueTuple<,,,,>).MakeGenericType(PrimaryKeyComponents.Select(property => property.PropertyType).ToArray()),
-			6 => typeof(ValueTuple<,,,,,>).MakeGenericType(PrimaryKeyComponents.Select(property => property.PropertyType).ToArray()),
-			7 => typeof(ValueTuple<,,,,,,>).MakeGenericType(PrimaryKeyComponents.Select(property => property.PropertyType).ToArray()),
-			_ => throw new NotSupportedException("Primary key more than 7-dimension is not supported."),
-		};
-	}
-	
-	private static void GetEntityMetadata(Type entityType, out EntityMetadata metadata)
-	{
-		lock (_metadataLock)
-		{
-			if (_metadata.TryGetValue(entityType, out metadata))
-			{
-				return;
-			}
-			
-			PrimaryKeyAttribute primaryKeyAttribute = entityType.GetCustomAttribute<PrimaryKeyAttribute>()!;
-			metadata = new()
-			{
-				PrimaryKeyComponents = primaryKeyAttribute.Components.Select(component => entityType.GetProperty(component)!).ToArray(),
-				RemainingProperties = entityType.GetProperties().Where(property => property.GetCustomAttribute<PropertyAttribute>() is not null && !primaryKeyAttribute.Components.Contains(property.Name)).ToArray(),
-			};
-			_metadata[entityType] = metadata;
-		}
-	}
 
 	private IInitializingRepository AllocateRepository(IRegistry registry, Type entityType)
 	{
-		GetEntityMetadata(entityType, out var metadata);
+		EntityMetadata.Get(entityType, out var metadata);
 		Type primaryKeyType = metadata.PrimaryKeyType;
 		Type repositoryType = typeof(Repository<,>).MakeGenericType(primaryKeyType, entityType);
 		var repository = (IInitializingRepository?)Activator.CreateInstance(repositoryType);
@@ -293,19 +256,8 @@ internal class RepositoryFactory
 					throw new InvalidOperationException();
 				}
 
-				string keyString;
-				XElement valueElement;
-				XAttribute? keyAttribute = element.Attribute(MAP_KEY_ELEMENT_NAME);
-				if (keyAttribute is null)
-				{
-					keyString = element.Element(MAP_KEY_ELEMENT_NAME)?.Value ?? throw new InvalidOperationException();
-					valueElement = element.Element(MAP_VALUE_ELEMENT_NAME) ?? throw new InvalidOperationException();
-				}
-				else
-				{
-					keyString = keyAttribute.Value;
-					valueElement = element;
-				}
+				string keyString = element.Element(MAP_KEY_ELEMENT_NAME)?.Value ?? throw new InvalidOperationException();
+				XElement valueElement = element.Element(MAP_VALUE_ELEMENT_NAME) ?? throw new InvalidOperationException();
 				
 				object key = SerializePrimitive(keyType, keyString);
 				object value = SerializeNonContainer(valueType, valueElement, ReturnNotNull.True, getEntity);
@@ -375,7 +327,7 @@ internal class RepositoryFactory
 			
 			XElement? entityReferenceElement = propertyElement.Elements().SingleOrDefault();
 			Type implementationType = entityReferenceElement is not null ? SchemaHelper.GetImplementationType(type, entityReferenceElement.Name.ToString()) : type;
-			GetEntityMetadata(implementationType, out var metadata);
+			EntityMetadata.Get(implementationType, out var metadata);
 			string[] rawComponents = (entityReferenceElement ?? propertyElement).Value.Split(entityReferenceElement?.Attribute(SEP_ATTRIBUTE_NAME)?.Value ?? DEFAULT_REFERENCE_SEP);
 			object primaryKey = MakePrimaryKey(metadata, rawComponents);
 			IEntity? entity = getEntity(implementationType, primaryKey);
@@ -433,9 +385,6 @@ internal class RepositoryFactory
 		[typeof(bool)] = static value => !string.IsNullOrWhiteSpace(value) && bool.Parse(value),
 		[typeof(string)] = static value => value,
 	};
-	
-	private static readonly Dictionary<Type, EntityMetadata> _metadata = new();
-	private static readonly Lock _metadataLock = new();
 	
 }
 

@@ -75,6 +75,7 @@
                     <Key>z</Key>
                     <Value>300</Value>
                 </Element>
+                <Element Key="w">999</Element>
             </AttributeMap>
             <AttachPoint>
                 <Point3D>
