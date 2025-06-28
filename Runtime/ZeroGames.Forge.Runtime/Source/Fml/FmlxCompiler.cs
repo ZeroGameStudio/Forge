@@ -14,12 +14,12 @@ public class FmlxCompiler
         foreach (var repositoryElement in result.Root!.Elements())
         {
             string repositoryName = repositoryElement.Name.ToString();
-            if (!repositoryName.EndsWith(REPOSITORY_SUFFIX))
+            if (!repositoryName.EndsWith(FmlSyntax.REPOSITORY_SUFFIX))
             {
                 throw new ArgumentOutOfRangeException(nameof(source));
             }
 
-            string entityTypeName = repositoryName.Substring(0, repositoryName.Length - REPOSITORY_SUFFIX.Length);
+            string entityTypeName = repositoryName.Substring(0, repositoryName.Length - FmlSyntax.REPOSITORY_SUFFIX.Length);
             if (SchemaHelper.GetDataType(source.RegistryType, entityTypeName) is not { } entityType)
             {
                 throw new ArgumentOutOfRangeException(nameof(source));
@@ -53,14 +53,14 @@ public class FmlxCompiler
                 {
                     foreach (var element in propertyElement.Elements())
                     {
-                        if (element.Attribute(MAP_KEY_ELEMENT_NAME) is { } keyAttribute)
+                        if (element.Attribute(FmlSyntax.MAP_KEY_ELEMENT_NAME) is { } keyAttribute)
                         {
                             string key = keyAttribute.Value;
-                            XElement keyElement = new(MAP_KEY_ELEMENT_NAME, key);
+                            XElement keyElement = new(FmlSyntax.MAP_KEY_ELEMENT_NAME, key);
                             
-                            element.SetAttributeValue(MAP_KEY_ELEMENT_NAME, null);
+                            element.SetAttributeValue(FmlSyntax.MAP_KEY_ELEMENT_NAME, null);
 
-                            XElement valueElement = new XElement(element) { Name = MAP_VALUE_ELEMENT_NAME };
+                            XElement valueElement = new XElement(element) { Name = FmlSyntax.MAP_VALUE_ELEMENT_NAME };
 
                             element.RemoveNodes();
                             element.Add(keyElement, valueElement);
@@ -79,11 +79,6 @@ public class FmlxCompiler
          * 4. Serialized container.
          */
     }
-    
-    private const string REPOSITORY_SUFFIX = "Repository";
-    
-    private const string MAP_KEY_ELEMENT_NAME = "Key";
-    private const string MAP_VALUE_ELEMENT_NAME = "Value";
 
 }
 

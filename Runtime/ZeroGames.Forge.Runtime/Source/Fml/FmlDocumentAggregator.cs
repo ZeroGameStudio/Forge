@@ -46,7 +46,7 @@ public class FmlDocumentAggregator : IFmlDocumentSource
 				XElement? existingRepository = result.Root.Elements(repository.Name).SingleOrDefault();
 				if (existingRepository is null)
 				{
-					if (dataTypesAttribute.Types.All(type => type.Name + REPOSITORY_SUFFIX != repository.Name))
+					if (dataTypesAttribute.Types.All(type => type.Name + FmlSyntax.REPOSITORY_SUFFIX != repository.Name))
 					{
 						throw new InvalidOperationException($"Unknown repository {repository.Name}.");
 					}
@@ -114,8 +114,6 @@ public class FmlDocumentAggregator : IFmlDocumentSource
 
         return new(_registryType, result);
     }
-
-    private const string REPOSITORY_SUFFIX = "Repository";
     
     private readonly Type _registryType;
     private readonly List<IFmlDocumentSource> _sources;

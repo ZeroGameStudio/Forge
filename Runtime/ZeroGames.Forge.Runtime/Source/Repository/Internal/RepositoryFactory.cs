@@ -54,7 +54,7 @@ internal class RepositoryFactory
 				property.SetValue(entity, value);
 			}
 
-			bool @abstract = entityElement.Attribute(ABSTRACT_ATTRIBUTE_NAME) is { } abstractAttr && bool.Parse(abstractAttr.Value);
+			bool @abstract = entityElement.Attribute(FmlSyntax.ABSTRACT_ATTRIBUTE_NAME) is { } abstractAttr && bool.Parse(abstractAttr.Value);
 			repository.RegisterEntity(entity, @abstract);
 			pendingInitializedEntities[entity] = entityElement;
 			
@@ -78,11 +78,11 @@ internal class RepositoryFactory
 				Logger?.Invoke(ELogVerbosity.Verbose, $"Fixing up entity {entityType.Name}({entity.PrimaryKey})...");
 				
 				// If entity extends another entity, then the base entity must get initialized first (recursively).
-				string? baseEntityReference = entityElement.Attribute(EXTENDS_ATTRIBUTE_NAME)?.Value;
+				string? baseEntityReference = entityElement.Attribute(FmlSyntax.EXTENDS_ATTRIBUTE_NAME)?.Value;
 				IEntity? baseEntity = null;
 				if (!string.IsNullOrWhiteSpace(baseEntityReference))
 				{
-					string[] rawComponents = baseEntityReference.Split(entityElement.Attribute(EXTENDS_SEP_ATTRIBUTE_NAME)?.Value ?? DEFAULT_REFERENCE_SEP);
+					string[] rawComponents = baseEntityReference.Split(entityElement.Attribute(FmlSyntax.EXTENDS_SEP_ATTRIBUTE_NAME)?.Value ?? FmlSyntax.DEFAULT_REFERENCE_SEP);
 					object primaryKey = MakePrimaryKey(metadata, rawComponents);
 					repository.TryGetEntity(primaryKey, true, out baseEntity);
 					if (baseEntity is null || baseEntity.GetType() != entityType)
@@ -94,7 +94,7 @@ internal class RepositoryFactory
 				}
 
 				// Now all base entities on the inheritance chain is initialized so we can initialize this entity.
-				bool @abstract = entityElement.Attribute(ABSTRACT_ATTRIBUTE_NAME) is { } abstractAttr && bool.Parse(abstractAttr.Value);
+				bool @abstract = entityElement.Attribute(FmlSyntax.ABSTRACT_ATTRIBUTE_NAME) is { } abstractAttr && bool.Parse(abstractAttr.Value);
 				if (!@abstract)
 				{
 					(entity as INotifyInitialization)?.PreInitialize();
@@ -213,7 +213,7 @@ internal class RepositoryFactory
 			var container = (IList)Activator.CreateInstance(instancedListType)!;
 			foreach (var element in propertyElement.Elements())
 			{
-				if (element.Name != CONTAINER_ELEMENT_ELEMENT_NAME)
+				if (element.Name != FmlSyntax.CONTAINER_ELEMENT_ELEMENT_NAME)
 				{
 					throw new InvalidOperationException();
 				}
@@ -229,10 +229,10 @@ internal class RepositoryFactory
 			Type elementType = genericSetType.GetGenericArguments()[0];
 			Type instancedSetType = typeof(HashSet<>).MakeGenericType(elementType);
 			object container = Activator.CreateInstance(instancedSetType)!;
-			MethodInfo addMethod = instancedSetType.GetMethod(HASHSET_ADD_METHOD_NAME)!;
+			MethodInfo addMethod = instancedSetType.GetMethod(nameof(HashSet<>.Add))!;
 			foreach (var element in propertyElement.Elements())
 			{
-				if (element.Name != CONTAINER_ELEMENT_ELEMENT_NAME)
+				if (element.Name != FmlSyntax.CONTAINER_ELEMENT_ELEMENT_NAME)
 				{
 					throw new InvalidOperationException();
 				}
@@ -251,13 +251,13 @@ internal class RepositoryFactory
 			var container = (IDictionary)Activator.CreateInstance(instancedMapType)!;
 			foreach (var element in propertyElement.Elements())
 			{
-				if (element.Name != CONTAINER_ELEMENT_ELEMENT_NAME)
+				if (element.Name != FmlSyntax.CONTAINER_ELEMENT_ELEMENT_NAME)
 				{
 					throw new InvalidOperationException();
 				}
 
-				string keyString = element.Element(MAP_KEY_ELEMENT_NAME)?.Value ?? throw new InvalidOperationException();
-				XElement valueElement = element.Element(MAP_VALUE_ELEMENT_NAME) ?? throw new InvalidOperationException();
+				string keyString = element.Element(FmlSyntax.MAP_KEY_ELEMENT_NAME)?.Value ?? throw new InvalidOperationException();
+				XElement valueElement = element.Element(FmlSyntax.MAP_VALUE_ELEMENT_NAME) ?? throw new InvalidOperationException();
 				
 				object key = SerializePrimitive(keyType, keyString);
 				object value = SerializeNonContainer(valueType, valueElement, ReturnNotNull.True, getEntity);
@@ -328,7 +328,7 @@ internal class RepositoryFactory
 			XElement? entityReferenceElement = propertyElement.Elements().SingleOrDefault();
 			Type implementationType = entityReferenceElement is not null ? SchemaHelper.GetImplementationType(type, entityReferenceElement.Name.ToString()) : type;
 			EntityMetadata.Get(implementationType, out var metadata);
-			string[] rawComponents = (entityReferenceElement ?? propertyElement).Value.Split(entityReferenceElement?.Attribute(SEP_ATTRIBUTE_NAME)?.Value ?? DEFAULT_REFERENCE_SEP);
+			string[] rawComponents = (entityReferenceElement ?? propertyElement).Value.Split(entityReferenceElement?.Attribute(FmlSyntax.SEP_ATTRIBUTE_NAME)?.Value ?? FmlSyntax.DEFAULT_REFERENCE_SEP);
 			object primaryKey = MakePrimaryKey(metadata, rawComponents);
 			IEntity? entity = getEntity(implementationType, primaryKey);
 			if (notnull && entity is null)
@@ -356,19 +356,6 @@ internal class RepositoryFactory
 
 		return serializer(value);
 	}
-	
-	private const string CONTAINER_ELEMENT_ELEMENT_NAME = "Element";
-	private const string MAP_KEY_ELEMENT_NAME = "Key";
-	private const string MAP_VALUE_ELEMENT_NAME = "Value";
-
-	private const string ABSTRACT_ATTRIBUTE_NAME = "Abstract";
-	private const string EXTENDS_ATTRIBUTE_NAME = "Extends";
-	private const string EXTENDS_SEP_ATTRIBUTE_NAME = "ExtendsSep";
-	private const string SEP_ATTRIBUTE_NAME = "Sep";
-
-	private const string HASHSET_ADD_METHOD_NAME = "Add";
-
-	private const string DEFAULT_REFERENCE_SEP = ",";
 
 	private static readonly IReadOnlyDictionary<Type, Func<string, object>> _fallbackPrimitiveSerializerMap = new Dictionary<Type, Func<string, object>>
 	{
