@@ -27,11 +27,9 @@
             <List>
                 <Element>
                     <List></List>
-                    <Set></Set>
                     <Map></Map>
                     <Struct>
                         <List></List>
-                        <Set></Set>
                         <Map></Map>
                         <Str></Str>
                     </Struct>
@@ -40,11 +38,9 @@
                 <Element>
                     <StructWithCollection1>
                         <List></List>
-                        <Set></Set>
                         <Map></Map>
                         <Struct>
                             <List></List>
-                            <Set></Set>
                             <Map></Map>
                             <Str></Str>
                         </Struct>
@@ -54,11 +50,9 @@
                 <Element>
                     <StructWithCollection1Sub>
                         <List></List>
-                        <Set></Set>
                         <Map></Map>
                         <Struct>
                             <List></List>
-                            <Set></Set>
                             <Map></Map>
                             <Str></Str>
                         </Struct>
@@ -73,63 +67,12 @@
             
             
             
-            <Set>
-                <Element>
-                    <List></List>
-                    <Set></Set>
-                    <Map></Map>
-                    <Struct>
-                        <List></List>
-                        <Set></Set>
-                        <Map></Map>
-                        <Str></Str>
-                    </Struct>
-                    <OptionalStruct></OptionalStruct>
-                </Element>
-                <Element>
-                    <StructWithCollection1>
-                        <List></List>
-                        <Set></Set>
-                        <Map></Map>
-                        <Struct>
-                            <List></List>
-                            <Set></Set>
-                            <Map></Map>
-                            <Str></Str>
-                        </Struct>
-                        <OptionalStruct></OptionalStruct>
-                    </StructWithCollection1>
-                </Element>
-                <Element>
-                    <StructWithCollection1Sub>
-                        <List></List>
-                        <Set></Set>
-                        <Map></Map>
-                        <Struct>
-                            <List></List>
-                            <Set></Set>
-                            <Map></Map>
-                            <Str></Str>
-                        </Struct>
-                        <OptionalStruct></OptionalStruct>
-                        <StrList>
-                            <Element>123</Element>
-                            <Element>12d s ds f,,,3</Element>
-                        </StrList>
-                    </StructWithCollection1Sub>
-                </Element>
-            </Set>
-            
-            
-            
             <Map>
                 <Element Key="123">
                     <List></List>
-                    <Set></Set>
                     <Map></Map>
                     <Struct>
                         <List></List>
-                        <Set></Set>
                         <Map></Map>
                         <Str></Str>
                     </Struct>
@@ -147,19 +90,6 @@
                                 </StructWithCollection2>
                             </Element>
                         </List>
-
-
-
-                        <Set>
-                            <Element>
-                                <StructWithCollection2>
-                                    <List></List>
-                                    <Set></Set>
-                                    <Map></Map>
-                                    <Str></Str>
-                                </StructWithCollection2>
-                            </Element>
-                        </Set>
 
 
 
@@ -232,7 +162,6 @@
                     <Value>
                         <StructWithCollection1Sub>
                             <List></List>
-                            <Set></Set>
                             <Map></Map>
                             <Struct>
                                 <List></List>
@@ -266,19 +195,6 @@
                         </StructWithCollection2>
                     </Element>
                 </List>
-                
-                
-                
-                <Set>
-                    <Element>
-                        <StructWithCollection2>
-                            <List></List>
-                            <Set></Set>
-                            <Map></Map>
-                            <Str></Str>
-                        </StructWithCollection2>
-                    </Element>
-                </Set>
                 
                 
                 

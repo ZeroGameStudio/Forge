@@ -92,9 +92,40 @@ public sealed partial class XmlCompilerFrontend : ICompilerFrontend
 			}
 		}
 		
-		// TODO: Check Type and Property name conflict.
+		ValidateSchema(schema);
 		
 		return schema;
+	}
+
+	private void ValidateSchema(ISchema schema)
+	{
+		static void Gather(ICompositeDataType dataType, HashSet<string> allPropertyNames, HashSet<string> allTypeNames)
+		{
+			allPropertyNames.UnionWith(dataType.Properties.Select(property => property.Name));
+			allTypeNames.Add(dataType.Name);
+
+			if (dataType.BaseType is { } baseType)
+			{
+				Gather(baseType, allPropertyNames, allTypeNames);
+			}
+
+			foreach (var i in dataType.Interfaces)
+			{
+				Gather(i, allPropertyNames, allTypeNames);
+			}
+		}
+		
+		foreach (var compositeType in schema.DataTypes.OfType<ICompositeDataType>())
+		{
+			HashSet<string> allPropertyNames = [];
+			HashSet<string> allTypeNames = [];
+			Gather(compositeType, allPropertyNames, allTypeNames);
+
+			if (allPropertyNames.Overlaps(allTypeNames))
+			{
+				throw new ParserException("One or more property names are conflict with type name.");
+			}
+		}
 	}
 
 	private readonly XmlCompilerFrontendOptions _options;

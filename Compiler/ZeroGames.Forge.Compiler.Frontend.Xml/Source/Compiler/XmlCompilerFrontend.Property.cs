@@ -142,7 +142,17 @@ public partial class XmlCompilerFrontend
 	
 	private Func<IInstancedContainerDataType> ParseSetContainerType(string valueTypePath, XElement propertyElement, ISchema propertySchema)
 	{
-		Func<IDataType> valueTypeFactory = ParseNonContainerType(valueTypePath, propertyElement, propertySchema);
+		Func<IDataType> valueTypeFactory = () =>
+		{
+			IDataType valueType = ParseNonContainerType(valueTypePath, propertyElement, propertySchema)();
+			// Note that set element is also used as key so it can only be primitive type which can be key.
+			if (valueType is not IPrimitiveDataType { CanBeKey: true } primitiveKeyType)
+			{
+				throw new ParserException($"Invalid value type: {valueTypePath}");
+			}
+
+			return primitiveKeyType;
+		};
 		return () => CompilationContext.GenericSetType.Instantiate(CompilationContext.VoidDataType, valueTypeFactory());
 	}
 	
@@ -153,7 +163,7 @@ public partial class XmlCompilerFrontend
 			IDataType keyType = ParseNonContainerType(keyTypePath, propertyElement, propertySchema)();
 			if (keyType is not IPrimitiveDataType { CanBeKey: true } primitiveKeyType)
 			{
-				throw new ParserException();
+				throw new ParserException($"Invalid key type: {keyTypePath}");
 			}
 
 			return primitiveKeyType;
