@@ -8,10 +8,11 @@ public class FmlxDocumentSource(Type registryType, XDocument source) : IFmlDocum
 {
 	public FmlxDocumentSource(Type registryType, Stream source) : this(registryType, XDocument.Load(source)){}
 	
-	public FmlDocument Document => field == default ? field = new FmlxCompiler().Compile(new(_registryType, _source)) : field;
+	public FmlDocument Document => _document ??= new FmlxCompiler { AllowedEntityElementPlaceholders = new HashSet<string> { "Item", "Entity" } }.Compile(new(_registryType, _source));
 	
 	private readonly Type _registryType = registryType;
 	private readonly XDocument _source = source;
+	private FmlDocument? _document;
 }
 
 public class FmlxDocumentSource<T>(XDocument source) : FmlxDocumentSource(typeof(T), source) where T : class, IRegistry

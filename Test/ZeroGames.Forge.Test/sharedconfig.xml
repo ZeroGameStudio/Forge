@@ -32,6 +32,7 @@
                         <List></List>
                         <Map></Map>
                         <Str></Str>
+                        <Set></Set>
                     </Struct>
                     <OptionalStruct></OptionalStruct>
                 </Element>
@@ -43,6 +44,7 @@
                             <List></List>
                             <Map></Map>
                             <Str></Str>
+                            <Set></Set>
                         </Struct>
                         <OptionalStruct></OptionalStruct>
                     </StructWithCollection1>
@@ -55,6 +57,7 @@
                             <List></List>
                             <Map></Map>
                             <Str></Str>
+                            <Set></Set>
                         </Struct>
                         <OptionalStruct></OptionalStruct>
                         <StrList>
@@ -75,6 +78,7 @@
                         <List></List>
                         <Map></Map>
                         <Str></Str>
+                        <Set></Set>
                     </Struct>
                     <OptionalStruct></OptionalStruct>
                 </Element>

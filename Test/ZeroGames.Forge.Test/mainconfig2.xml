@@ -133,15 +133,15 @@
 
     <IconRepository>
         
-        <Icon>
+        <Item>
             <Id>10001001</Id>
             <Path>/Game/UI/Icons/10001001</Path>
-        </Icon>
+        </Item>
 
-        <Icon>
+        <Entity>
             <Id>10001002</Id>
             <Path>/Game/UI/Icons/10001002</Path>
-        </Icon>
+        </Entity>
 
         <Icon>
             <Id>20001001</Id>

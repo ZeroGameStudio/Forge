@@ -6,6 +6,8 @@ namespace ZeroGames.Forge.Runtime;
 
 public class FmlxCompiler
 {
+
+    public IReadOnlySet<string>? AllowedEntityElementPlaceholders { get; init; }
     
     public FmlDocument Compile(FmlDocument source)
     {
@@ -30,7 +32,12 @@ public class FmlxCompiler
             {
                 if (entityElement.Name != entityTypeName)
                 {
-                    throw new InvalidOperationException($"Entity element name {entityElement.Name} mismatch to required {entityType.Name}.");
+                    if (AllowedEntityElementPlaceholders?.Contains(entityElement.Name.ToString()) is not true)
+                    {
+                        throw new InvalidOperationException($"Entity element name {entityElement.Name} mismatch to required {entityType.Name}.");
+                    }
+
+                    entityElement.Name = entityTypeName;
                 }
 
                 if (metadata is null)
