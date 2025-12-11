@@ -102,11 +102,11 @@ public class RegistryFactory : IRegistryFactory
 			Logger?.Invoke(ELogVerbosity.Log, "Merging repositories to base...");
 			foreach (var repository in repositoryByEntityType
 				         .Select(pair => pair.Value)
-				         .Where(repo => repo.EntityType.BaseType is {} baseType && baseType != typeof(object))
+				         .Where(repo => repo.EntityType.BaseType is {} baseType && baseType.IsAssignableTo(typeof(IEntity))) // This allows user code to add non-entity base type.
 				         .OrderByDescending(repo =>
 				         {
 					         int32 depth = 0;
-					         for (Type? baseType = repo.EntityType.BaseType; baseType is {} b && b != typeof(object); baseType = baseType.BaseType) ++depth;
+					         for (Type? baseType = repo.EntityType.BaseType; baseType is {} b && b.IsAssignableTo(typeof(IEntity)); baseType = baseType.BaseType) ++depth;
 					         return depth;
 				         }))
 			{
